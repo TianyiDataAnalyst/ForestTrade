@@ -53,7 +53,7 @@ pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] 
 #pairs = ['EUR_JPY','USD_JPY','AUD_JPY','AUD_USD','AUD_NZD','NZD_USD']
 
 def candles(instrument):
-    params = {"count": 1500,"granularity": list(CandlestickGranularity)[18]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    params = {"count": 1500,"granularity": list(CandlestickGranularity)[4]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -73,11 +73,11 @@ def candles(instrument):
 # =============================================================================
 def convert_currency(instrument):
     df = candles(instrument)
-    df.index = pd.to_datetime(df.index) # change datetime to date, NOTE if granularity is less than day please delete
+    #df.index = pd.to_datetime(df.index) # change datetime to date, NOTE if granularity is less than day please delete
     df = df.reset_index()
     df.columns= ['Date','Open','High','Low','Close','Volume']
-    df.Date = pd.to_datetime(df.Date,format='%d.%m.%Y %H:%M:%S.%f')
-    df['Date'] = df['Date'].dt.date
+    #df.Date = pd.to_datetime(df.Date,format='%d.%m.%Y %H:%M:%S.%f')
+    #df['Date'] = df['Date'].dt.date
     df = df.set_index(df.Date)
     df = df[['Open','High','Low','Close','Volume']]
     df = df.drop_duplicates(keep=False)
@@ -97,11 +97,11 @@ SYMBOLS = ['AUD_USD','CAD_USD','NZD_USD','SPX500_USD']
 #SYMBOLS = ['AUD_USD','GBP_USD','CAD_USD','CHF_USD','EUR_USD','JPY_USD','NZD_USD']
 def clean_format(instrument):
     df = candles(instrument)
-    df.index = pd.to_datetime(df.index) # change datetime to date, NOTE if granularity is less than day please delete
+    #df.index = pd.to_datetime(df.index) # change datetime to date, NOTE if granularity is less than day please delete
     df = df.reset_index()
     df.columns= ['Date','Open','High','Low','Close','Volume']
-    df.Date = pd.to_datetime(df.Date,format='%d.%m.%Y %H:%M:%S.%f')
-    df['Date'] = df['Date'].dt.date
+    #df.Date = pd.to_datetime(df.Date,format='"%Y%m%d%H%M%S"')   # change datetime to date,
+    #df['Date'] = df['Date'].dt.date   # change datetime to date,
     df = df.set_index(df.Date)
     df = df[['Open','High','Low','Close','Volume']]
     df = df.drop_duplicates(keep=False)
@@ -110,33 +110,33 @@ def clean_format(instrument):
 
 
 #dictionary structure:https://realpython.com/python-dicts/
-#jpyusd = convert_currency('USD_JPY')
-#usdjpy = clean_format('USD_JPY')
+jpyusd = convert_currency('USD_JPY')
 #jpyusd['Open'].count()
 #jpyusd = jpyusd.assign(symbol=pd.Series('JPY_USD', index=jpyusd.index))
 #jpyusd_dict = jpyusd.groupby('symbol').apply(lambda dfg: dfg.drop('symbol', axis=1).to_dict(orient='list')).to_dict()
 
-#chfusd = convert_currency('USD_CHF')
+chfusd = convert_currency('USD_CHF')
+
 #chfusd = chfusd.assign(symbol=pd.Series('CHF_USD', index=chfusd.index))
 #chfusd_dict = chfusd.groupby('symbol').apply(lambda dfg: dfg.drop('symbol', axis=1).to_dict(orient='list')).to_dict()
 
 audusd = clean_format('AUD_USD')
-audusd['Open'].count()
+#audusd['Open'].count()
 #audusd = audusd.assign(symbol=pd.Series('AUD_USD', index=audusd.index))
 #audusd_dict = audusd.groupby('symbol').apply(lambda dfg: dfg.drop('symbol', axis=1).to_dict(orient='list')).to_dict()
 
 #['GBP_USD','CAD_USD','EUR_USD','NZD_USD']
 cadusd = convert_currency('USD_CAD')
 
-#gbpusd = clean_format('GBP_USD')
-#eurusd = clean_format('EUR_USD')
+gbpusd = clean_format('GBP_USD')
+eurusd = clean_format('EUR_USD')
 nzdusd = clean_format('NZD_USD')
 spxusd = clean_format('SPX500_USD')
 
 
 
 symbols_data = {'AUD_USD' : audusd, 'NZD_USD': nzdusd, 'CAD_USD': cadusd,'SPX500_USD': spxusd}
-#symbols_data = {  'USD_JPY' : usdjpy, 'JPY_USD': jpyusd, 'CHF_USD': chfusd, 'AUD_USD' : audusd, 'NZD_USD': nzdusd, 'EUR_USD': eurusd, 'GBP_USD': gbpusd, 'CAD_USD': cadusd}
+#symbols_data = {  'JPY_USD': jpyusd, 'CHF_USD': chfusd, 'AUD_USD' : audusd, 'NZD_USD': nzdusd, 'EUR_USD': eurusd, 'GBP_USD': gbpusd, 'CAD_USD': cadusd}
 for symbol in SYMBOLS:
     data = symbols_data[symbol]
 
@@ -152,8 +152,7 @@ for symbol in SYMBOLS:
   multiplier = 1.0
   if symbol == 'SPX500_USD':
     multiplier = 1/2800
-  if symbol == 'USD_JPY':
-    multiplier = 1/110
+
   label = symbol + ' ClosePrice'
   price_data = price_data.assign(label=pd.Series(symbols_data[symbol]['Close'] * multiplier, index=symbols_data[symbol].index))
   ax = price_data['label'].plot(color=next(cycol), lw=2., label=label)
