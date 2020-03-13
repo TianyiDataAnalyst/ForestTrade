@@ -111,6 +111,7 @@ def clean_format(instrument):
 
 #dictionary structure:https://realpython.com/python-dicts/
 jpyusd = convert_currency('USD_JPY')
+#jpyusd['Open'].count()
 #jpyusd = jpyusd.assign(symbol=pd.Series('JPY_USD', index=jpyusd.index))
 #jpyusd_dict = jpyusd.groupby('symbol').apply(lambda dfg: dfg.drop('symbol', axis=1).to_dict(orient='list')).to_dict()
 
@@ -119,6 +120,7 @@ chfusd = convert_currency('USD_CHF')
 #chfusd_dict = chfusd.groupby('symbol').apply(lambda dfg: dfg.drop('symbol', axis=1).to_dict(orient='list')).to_dict()
 
 audusd = clean_format('AUD_USD')
+audusd['Open'].count()
 #audusd = audusd.assign(symbol=pd.Series('AUD_USD', index=audusd.index))
 #audusd_dict = audusd.groupby('symbol').apply(lambda dfg: dfg.drop('symbol', axis=1).to_dict(orient='list')).to_dict()
 
