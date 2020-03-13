@@ -1,4 +1,4 @@
 March 12 2020
-1. 找出StatAtr.py的下单逻辑；
-2. 将这一逻辑植入到sma-crossover-v4-executable_test_quick_test.py中:
-Line 321 StatArb execution logic 到Line 397
+1. StatAtr.py的下单逻辑：Line 321 StatArb execution logic 到Line 397
+2. 将这一逻辑植入到sma-crossover-v4-executable_test_quick_test.py中:替换原有下单逻辑
+
