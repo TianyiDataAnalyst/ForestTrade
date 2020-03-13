@@ -1,4 +1,4 @@
 March 12 2020
 1. 找出StatAtr.py的下单逻辑；
-2. 将这一逻辑植入到sma-crossover-v4-executable_test_quick_test.py中；
-3. 改变日线到5秒钟交易，并分析变动合理性；
+2. 将这一逻辑植入到sma-crossover-v4-executable_test_quick_test.py中:
+Line 321 StatArb execution logic 到Line 397
