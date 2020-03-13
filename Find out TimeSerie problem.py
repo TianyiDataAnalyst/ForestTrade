@@ -32,7 +32,7 @@ pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] 
 #pairs = ['EUR_JPY','USD_JPY','AUD_JPY','AUD_USD','AUD_NZD','NZD_USD']
 
 def candles(instrument):
-    params = {"count": 1500,"granularity": list(CandlestickGranularity)[18]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    params = {"count": 1500,"granularity": list(CandlestickGranularity)[0]} #granularity is in 'S5'- 5 seconds; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
