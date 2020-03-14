@@ -44,7 +44,7 @@ import numpy as np
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
 
 #initiating API connection and defining trade parameters
-token_path = "/Users/tianyigu/Downloads/token.txt"
+token_path = "C:\\Oanda\\token.txt" # Windows system format: "C:\\Oanda\\token.txt"; "token.txt" in PyCharm; ios "/Users/tianyigu/Downloads/token.txt"
 client = oandapyV20.API(access_token=open(token_path,'r').read(),environment="practice")
 account_id = "101-002-9736246-001"
 
