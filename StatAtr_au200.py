@@ -206,7 +206,7 @@ open_pnl = 0  # Open/Unrealized PnL marked to market
 closed_pnl = 0  # Closed/Realized PnL so far
 
 # Constants that define strategy behavior/thresholds
-StatArb_VALUE_FOR_BUY_ENTRY = 0.01  # StatArb trading signal value aboe which to enter buy-orders/long-position
+StatArb_VALUE_FOR_BUY_ENTRY = 0.01  # StatArb trading signal value above which to enter buy-orders/long-position
 StatArb_VALUE_FOR_SELL_ENTRY = -0.01  # StatArb trading signal value below which to enter sell-orders/short-position
 MIN_PRICE_MOVE_FROM_LAST_TRADE = 0.01  # Minimum price change since last trade before considering trading again, this is to prevent over-trading at/around same prices
 NUM_SHARES_PER_TRADE = 1000000  # Number of currency to buy/sell on every trade
