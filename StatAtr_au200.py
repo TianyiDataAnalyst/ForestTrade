@@ -191,7 +191,7 @@ delta_projected_actual_history = {} # history of differences between Projected C
 final_delta_projected_history = [] # history of differences between final Projected ClosePrice deviation for TRADING_INSTRUMENT and actual ClosePrice deviation
 
 # Variables for Trading Strategy trade, position & pnl management:
-orders = []  # Container for tracking buy/sell order, +1 for buy order, -1 for sell order, 0 for no-action
+orders_container = []  # Container for tracking buy/sell order, +1 for buy order, -1 for sell order, 0 for no-action
 positions = []  # Container for tracking positions, +ve for long positions, -ve for short positions, 0 for flat/no position
 pnls = []  # Container for tracking total_pnls, this is the sum of closed_pnl i.e. pnls already locked in and open_pnl i.e. pnls for open-position marked to market price
 
@@ -332,7 +332,7 @@ for i in range(0, num_days):
   if ((final_delta_projected < StatArb_VALUE_FOR_SELL_ENTRY and abs(close_price - last_sell_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE)  # StatArb above sell entry threshold, we should sell
       or
       (position > 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))):  # long from -ve StatArb and StatArb has gone positive or position is profitable, sell to close position
-    orders.append(-1)  # mark the sell trade
+    orders_container.append(-1)  # mark the sell trade
     last_sell_price = close_price
     position -= NUM_SHARES_PER_TRADE  # reduce position by the size of this trade
     sell_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update vwap sell-price
@@ -351,7 +351,7 @@ for i in range(0, num_days):
   elif ((final_delta_projected > StatArb_VALUE_FOR_BUY_ENTRY and abs(close_price - last_buy_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE)  # StatArb below buy entry threshold, we should buy
         or
         (position < 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))):  # short from +ve StatArb and StatArb has gone negative or position is profitable, buy to close position
-    orders.append(+1)  # mark the buy trade
+    orders_container.append(+1)  # mark the buy trade
     last_buy_price = close_price
     position += NUM_SHARES_PER_TRADE  # increase position by the size of this trade
     buy_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update the vwap buy-price
@@ -364,7 +364,7 @@ for i in range(0, num_days):
 # =============================================================================
   else:
     # No trade since none of the conditions were met to buy or sell
-    orders.append(0)
+    orders_container.append(0)
 
   positions.append(position)
 
@@ -464,7 +464,7 @@ the other strongly correlated pairs can help offset bad predictions, which we di
 #Now, let's set up our data frames to plot the close price, trades, positions, and PnLs we will observe:
 delta_projected_actual_data = delta_projected_actual_data.assign(ClosePrice=pd.Series(symbols_data[TRADING_INSTRUMENT]['Close'], index=symbols_data[TRADING_INSTRUMENT].index))
 delta_projected_actual_data = delta_projected_actual_data.assign(FinalStatArbTradingSignal=pd.Series(final_delta_projected_history, index=symbols_data[TRADING_INSTRUMENT].index))
-delta_projected_actual_data = delta_projected_actual_data.assign(Trades=pd.Series(orders, index=symbols_data[TRADING_INSTRUMENT].index))
+delta_projected_actual_data = delta_projected_actual_data.assign(Trades=pd.Series(orders_container, index=symbols_data[TRADING_INSTRUMENT].index))
 delta_projected_actual_data = delta_projected_actual_data.assign(Position=pd.Series(positions, index=symbols_data[TRADING_INSTRUMENT].index))
 delta_projected_actual_data = delta_projected_actual_data.assign(Pnl=pd.Series(pnls, index=symbols_data[TRADING_INSTRUMENT].index))
 
