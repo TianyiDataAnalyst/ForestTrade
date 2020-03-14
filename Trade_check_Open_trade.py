@@ -21,7 +21,7 @@ df_open_trade = pd.DataFrame(client.request(trades.OpenTrades(accountID=account_
 
 # Check if Dataframe is empty using empty attribute
 if df_open_trade.empty == True:
-    print('DataFrame is empty')
+    print('No open trade, Ready to put order')
 else:
     df_open_trade['currentUnits'] = df_open_trade['currentUnits'].apply(pd.to_numeric)
     df_open_trade['price'] = df_open_trade['price'].apply(pd.to_numeric)
