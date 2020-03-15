@@ -377,26 +377,25 @@ def main():
       if ((final_delta_projected < StatArb_VALUE_FOR_SELL_ENTRY and abs(close_price - last_sell_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE)  # StatArb above sell entry threshold, we should sell
           or
           (position > 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))):  # long from -ve StatArb and StatArb has gone positive or position is profitable, sell to close position
-        orders_container.append(-1)  # mark the sell trade
-        last_sell_price = close_price
-        position -= NUM_SHARES_PER_TRADE  # reduce position by the size of this trade
-        sell_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update vwap sell-price
-        sell_sum_qty += NUM_SHARES_PER_TRADE
-        if i > 1498:
-            data = candles('USD_CAD')
-             
-            # This regex removes all colons and all
-            # dashes EXCEPT for the dash indicating + or - utc offset for the timezone
-            last_row_date = (data.index)[-1]
-            conformed_timestamp = re.sub(r"[:]|([-](?!((\d{2}[:]\d{2})|(\d{4}))$))", '', last_row_date)
-            start_day = dt.date(int(conformed_timestamp[0:4]),int(conformed_timestamp[4:6]),int(conformed_timestamp[6:8]))
-            #dateutil.parser.parse((candles('EUR_USD').index)[-1])
-            end_day = dt.date.today()
-            #datetime.datetime.now().date()
-            business_days_diff = np.busday_count(start_day, end_day)
-            if business_days_diff>=1:
-                market_order('USD_CAD',-1*NUM_SHARES_PER_TRADE,str(ATR(data,120)))
-                print("New short position initiated ", " Stop loss at", str(ATR(data,120))
+          orders_container.append(-1)  # mark the sell trade
+          last_sell_price = close_price
+          position -= NUM_SHARES_PER_TRADE  # reduce position by the size of this trade
+          sell_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update vwap sell-price
+          caddata = candles('USD_CAD')
+          sell_sum_qty += NUM_SHARES_PER_TRADE
+          if i > 1498:
+              # This regex removes all colons and all
+              # dashes EXCEPT for the dash indicating + or - utc offset for the timezone
+              last_row_date = (data.index)[-1]
+              conformed_timestamp = re.sub(r"[:]|([-](?!((\d{2}[:]\d{2})|(\d{4}))$))", '', last_row_date)
+              start_day = dt.date(int(conformed_timestamp[0:4]),int(conformed_timestamp[4:6]),int(conformed_timestamp[6:8]))
+              #dateutil.parser.parse((candles('EUR_USD').index)[-1])
+              end_day = dt.date.today()
+              #datetime.datetime.now().date()
+              business_days_diff = np.busday_count(start_day, end_day)
+              if business_days_diff>=1:
+                  market_order('USD_CAD',-1*NUM_SHARES_PER_TRADE,str(ATR(caddata,120)))
+                  print("New short position initiated ", " Stop loss at", str(ATR(caddata,120))
         #simulate trade
         #print trade result 
     # =============================================================================
@@ -408,29 +407,29 @@ def main():
       # We will perform a buy trade at close_prices if the following conditions are met:
       # 1. The StatArb trading signal value is above Buy-Entry threshold and the difference between last trade-price and current-price is different enough.
       # 2. We are short( -ve position ) and current position is profitable enough to lock profit.
-      elif ((final_delta_projected > StatArb_VALUE_FOR_BUY_ENTRY and abs(close_price - last_buy_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE)  # StatArb below buy entry threshold, we should buy
-            or
-            (position < 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))):  # short from +ve StatArb and StatArb has gone negative or position is profitable, buy to close position
-        orders_container.append(+1)  # mark the buy trade
-        last_buy_price = close_price
-        position += NUM_SHARES_PER_TRADE  # increase position by the size of this trade
-        buy_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update the vwap buy-price
-        buy_sum_qty += NUM_SHARES_PER_TRADE
+      if ((final_delta_projected < StatArb_VALUE_FOR_SELL_ENTRY and abs(close_price - last_sell_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE) 
+      or 
+      (position > 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))):  # long from -ve StatArb and StatArb has gone positive or position is profitable, sell to close position
+          orders_container.append(+1)  # mark the buy trade
+          last_buy_price = close_price
+          position += NUM_SHARES_PER_TRADE  # increase position by the size of this trade
+          buy_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update the vwap buy-price
+          buy_sum_qty += NUM_SHARES_PER_TRADE
         
-        data = candles('USD_CAD')
+          data = candles('USD_CAD')
          
         # This regex removes all colons and all
         # dashes EXCEPT for the dash indicating + or - utc offset for the timezone
-        last_row_date = (data.index)[-1]
-        conformed_timestamp = re.sub(r"[:]|([-](?!((\d{2}[:]\d{2})|(\d{4}))$))", '', last_row_date)
-        start_day = dt.date(int(conformed_timestamp[0:4]),int(conformed_timestamp[4:6]),int(conformed_timestamp[6:8]))
+          last_row_date = (data.index)[-1]
+          conformed_timestamp = re.sub(r"[:]|([-](?!((\d{2}[:]\d{2})|(\d{4}))$))", '', last_row_date)
+          start_day = dt.date(int(conformed_timestamp[0:4]),int(conformed_timestamp[4:6]),int(conformed_timestamp[6:8]))
         #dateutil.parser.parse((candles('EUR_USD').index)[-1])
-        end_day = dt.date.today()
+          end_day = dt.date.today()
         #datetime.datetime.now().date()
-        business_days_diff = np.busday_count(start_day, end_day)
-        if business_days_diff>=1:
-            market_order('USD_CAD',1*NUM_SHARES_PER_TRADE,str(ATR(data,120)))
-            print("New long position initiated ", " Stop loss at", str(ATR(data,120))
+          business_days_diff = np.busday_count(start_day, end_day)
+          if business_days_diff>=1:
+              market_order('USD_CAD',1*NUM_SHARES_PER_TRADE,str(ATR(data,120)))
+              print("New long position initiated ", " Stop loss at", str(ATR(data,120))
         #simulate trade
         #print trade result    
     # =============================================================================
