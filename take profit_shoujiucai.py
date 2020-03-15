@@ -129,16 +129,32 @@ r = orders.OrderCreate(accountID, data=data)
 client.request(r)
 
 df_open_trade = pd.DataFrame(client.request(trades.OpenTrades(accountID=account_id))['trades'])
+
+
+# Check if Dataframe is empty using empty attribute
+if df_open_trade.empty == True:
+    print('DataFrame is empty')
+else:
+    df_open_trade['currentUnits'] = df_open_trade['currentUnits'].apply(pd.to_numeric)
+    df_open_trade['price'] = df_open_trade['price'].apply(pd.to_numeric)
+    df_open_trade['unrealizedPL']
+
+
+# Check if Dataframe is empty using empty attribute
+if dfObj.empty == True:
+    print('DataFrame is empty')
+else:
+    print('DataFrame is not empty')
 df_open_trade['currentUnits'] = df_open_trade['currentUnits'].apply(pd.to_numeric)
 df_open_trade['price'] = df_open_trade['price'].apply(pd.to_numeric)
 df_open_trade['unrealizedPL']
 
-'unrealizedPL
+'unrealizedPL'
 
 jpy_array = df_open_trade['instrument'].array
 if any("JPY" in i for i in jpy_array):
     print (1)
-find_JPY()
+
 jpy_array
 df_open_trade['instrument'].array
 df_open_trade.index = df_open_trade['id']
@@ -155,7 +171,7 @@ print (deftrades.TradePL().definitions[c.POSITIVE])
 
 
 import oandapyV20.endpoints.positions as positions
-r = positions.PositionDetails(accountID=accountID, instrument)
+r = positions.PositionDetails(accountID=account_id, instrument="USD_CAD")
 client.request(r)
 print (r.response)
 

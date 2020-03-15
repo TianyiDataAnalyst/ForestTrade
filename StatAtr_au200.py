@@ -402,7 +402,7 @@ for i in range(0, num_days):
 # =============================================================================
   
   
-#plot 2
+print('plot 2')
 """
 Let's visualize a few more details about the signals in this trading strategy, starting with the correlations 
 between CAD/USD and the other currency pairs as it evolves over time:
@@ -435,7 +435,7 @@ JPY/USD is the least correlated to CAD/USD price deviations.
 """
 
 
-#plot 3
+print('plot 3')
 """
 Now, let's inspect the delta between projected and actual price deviations in CAD/USD as projected by 
 each individual currency pair individually:
@@ -460,7 +460,7 @@ StatArb benefits from having multiple leading trading instruments, because when 
 the other strongly correlated pairs can help offset bad predictions, which we discussed earlier.
 """
 
-#plot 4
+print('plot 4')
 #Now, let's set up our data frames to plot the close price, trades, positions, and PnLs we will observe:
 delta_projected_actual_data = delta_projected_actual_data.assign(ClosePrice=pd.Series(symbols_data[TRADING_INSTRUMENT]['Close'], index=symbols_data[TRADING_INSTRUMENT].index))
 delta_projected_actual_data = delta_projected_actual_data.assign(FinalStatArbTradingSignal=pd.Series(final_delta_projected_history, index=symbols_data[TRADING_INSTRUMENT].index))
@@ -481,7 +481,7 @@ Now, let's look at the actual code to build visualization for the final StatArb 
 This will help us understand for what signal values buy and sell trades are made and if that is in line with our expectations: (connect to next plot analysis)
 """
 
-#plot 5
+print('plot 5')
 """
 Since we adopted the trend-following approach in our StatArb trading strategy, we expect to buy when the signal value is positive and sell when the signal value is negative. Let's see whether that's the case in the plot:
 """
@@ -502,7 +502,7 @@ The buy trades made when signal values are negative and sell trades made when si
 as we saw in our previous mean reversion and trend-following trading strategies.
 """
 
-#plot 6
+print('plot 6')
 """
 Let's wrap up our analysis of StatArb trading strategies by visualizing the positions and PnLs:
 """
@@ -522,7 +522,7 @@ The position plot shows the evolution of the StatArb trading strategy's position
 Remember that these positions are in dollar notional terms, so a position of 100K is equivalent to roughly 1 future contract, 
 which we mention to make it clear that a position of 100K does not mean a position of 100K contracts!
 """
-#plot 7
+print('plot 7')
 # Finally, let's have a look at the code for the PnL plot, identical to what we've been using before:
 plt.plot(delta_projected_actual_data.index, delta_projected_actual_data.Pnl, color='k', lw=1., label='Pnl')
 plt.plot(delta_projected_actual_data.loc[delta_projected_actual_data.Pnl > 0].index, delta_projected_actual_data.Pnl[delta_projected_actual_data.Pnl > 0], color='g', lw=0, marker='.')
