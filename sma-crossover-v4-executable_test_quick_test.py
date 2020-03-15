@@ -64,20 +64,20 @@ def candles_h3(instrument):
 #candles_h3('EUR_USD')['l'].tail(1) #3hours lowest point
 
 def stochastic(df,a,b,c):
-    "function to calculate stochastic"
+    #"function to calculate stochastic"
     df['k']=((df['c'] - df['l'].rolling(a).min())/(df['h'].rolling(a).max()-df['l'].rolling(a).min()))*100
     df['K']=df['k'].rolling(b).mean() 
     df['D']=df['K'].rolling(c).mean()
     return df
 
 def SMA(df,a,b):
-    "function to calculate stochastic"
+    #"function to calculate stochastic"
     df['sma_fast']=df['c'].rolling(a).mean() 
     df['sma_slow']=df['c'].rolling(b).mean() 
     return df
 
 def slope(ser,n):
-    "function to calculate the slope of n consecutive points on a plot"
+    #"function to calculate the slope of n consecutive points on a plot"
     slopes = [i*0 for i in range(n-1)]
     for i in range(n,len(ser)+1):
         y = ser[i-n:i]
@@ -91,11 +91,11 @@ def slope(ser,n):
     slope_angle = (np.rad2deg(np.arctan(np.array(slopes))))
     return np.array(slope_angle)
 """
-data = candles('EUR_USD')
-data["slope"] = slope(data["c"],13)
-data["slope"].tail(1)
+df = candles('EUR_USD')
+df["slope"] = slope(data["c"],5)
+df["slope"].tail(1)
 
-data.iloc[:,[4,6]].plot(subplots=True, layout = (2,1))
+data.iloc[:,[3,5]].plot(subplots=True, layout = (2,1))
 """
 
 def market_order(instrument,units,sl):
@@ -134,23 +134,22 @@ def ATR(DF,n):
 data_h3 = candles_h3('CAD_JPY')
 ATR(data_h3,120)
 """
+# df = candles('EUR_USD')
 
-def trade_signal(df,curr):
+def trade_signal(df):
     signal = ""
-    df["slope"] = slope(df["c"],23)
+    df["slope"] = slope(df["c"],5)
     "function to generate signal"
-    if (df["slope"].tail(1)>1).bool() == True:
-        upward_dir[curr] = True
-        dnward_dir[curr] = False
+    if (df["slope"].tail(1)<-39).bool() == True:
         signal = "Buy"
-    if (df["slope"].tail(1)<0).bool() == True:
-        upward_dir[curr] = False
-        dnward_dir[curr] = True
+    if (df["slope"].tail(1)>39).bool() == True:
         signal = "Sell"
     return signal
 """   
 df = candles('EUR_USD')
-trade_signal(df,'EUR_USD')
+df["slope"] = slope(data["c"],5)
+df["slope"].tail(1)
+trade_signal(df)
 """
 def main():
     for currency in pairs:
@@ -163,7 +162,7 @@ def main():
                 data = candles(currency)
                 ohlc_df = stochastic(data,14,3,3)
                 ohlc_df = SMA(ohlc_df,100,200)
-                signal = trade_signal(ohlc_df,currency)
+                signal = trade_signal(ohlc_df)
                 if signal == "Buy":
                     market_order(currency,pos_size,str(ATR(data,120)))
                     print("New long position initiated for ", currency)
@@ -178,6 +177,8 @@ def main():
                     f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + "New long position initiated for " + currency + '\n' )
                     f.write("passthrough at " )
                     f.close()
+                else:
+                    print(currency, "not meet the trade critiers")
                 
 starttime=time.time()
 timeout = time.time() + (60*0)+60*1  # 60 seconds times 60 meaning the script will run for 1 hr
