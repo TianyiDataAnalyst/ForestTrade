@@ -35,7 +35,7 @@ for i in pairs:
     dnward_dir[i] = False
 
 def candles(instrument):
-    params = {"count": 250,"granularity": list(CandlestickGranularity)[0]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D, weeks W or months M
+    params = {"count": 250,"granularity": list(CandlestickGranularity)[4]} #granularity is in 1 minute[4] 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D, weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=pairs[0],params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -140,9 +140,9 @@ def trade_signal(df):
     signal = ""
     df["slope"] = slope(df["c"],5)
     "function to generate signal"
-    if (df["slope"].tail(1)<-39).bool() == True:
+    if (df["slope"].tail(1)<-45).bool() == True:
         signal = "Buy"
-    if (df["slope"].tail(1)>39).bool() == True:
+    if (df["slope"].tail(1)>45).bool() == True:
         signal = "Sell"
     return signal
 """   
@@ -155,7 +155,7 @@ def main():
     for currency in pairs:
         print("analyzing ",currency)
         data = candles(currency)
-        data_h3 = candles_h3(currency)
+        #data_h3 = candles_h3(currency)
         #signal = trade_signal(data,currency)
         for currency in pairs:
                 print("analyzing ",currency)
