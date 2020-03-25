@@ -35,7 +35,7 @@ for i in pairs:
     dnward_dir[i] = False
 
 def candles(instrument):
-    params = {"count": 250,"granularity": list(CandlestickGranularity)[4]} #granularity is in 1 minute[4] 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D, weeks W or months M
+    params = {"count": 250,"granularity": list(CandlestickGranularity)[0]} #granularity is in 1 minute[4] 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D, weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=pairs[0],params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -155,8 +155,14 @@ def main():
     for currency in pairs:
         print("analyzing ",currency)
         data = candles(currency)
-        #data_h3 = candles_h3(currency)
+        data_h3 = candles_h3(currency)
         #signal = trade_signal(data,currency)
+        r = trades.OpenTrades(accountID=account_id)
+        open_trades = client.request(r)['trades']
+        curr_ls = []
+        for i in range(len(open_trades)):
+            curr_ls.append(open_trades[i]['instrument'])
+        pairs = [i for i in pairs if i not in curr_ls]
         for currency in pairs:
                 print("analyzing ",currency)
                 data = candles(currency)
@@ -164,14 +170,14 @@ def main():
                 ohlc_df = SMA(ohlc_df,100,200)
                 signal = trade_signal(ohlc_df)
                 if signal == "Buy":
-                    market_order(currency,pos_size,str(ATR(data,120)))
+                    market_order(currency,pos_size,str(ATR(data_h3,120)))
                     print("New long position initiated for ", currency)
                     f = open("C:\\Oanda\\Tradebot\\log.txt", "a+")
                     f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + "New long position initiated for " + currency + '\n' )
                     f.write("passthrough at " )
                     f.close()
                 elif signal == "Sell":
-                    market_order(currency,-1*pos_size,str(ATR(data,120)))
+                    market_order(currency,-1*pos_size,str(ATR(data_h3,120)))
                     print("New short position initiated for ", currency)
                     f = open("C:\\Oanda\\Tradebot\\log.txt", "a+")
                     f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + "New long position initiated for " + currency + '\n' )

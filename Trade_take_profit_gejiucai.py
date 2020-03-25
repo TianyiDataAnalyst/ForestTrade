@@ -6,12 +6,11 @@ Created on Thu Mar  5 15:20:54 2020
 """
 
 import oandapyV20
-from oandapyV20.contrib.requests import TakeProfitOrderRequest
-import oandapyV20.endpoints.orders as orders
 import oandapyV20.endpoints.trades as trades
 import pandas as pd
 #import matplotlib.pyplot as plt
 import numpy as np
+import time
 
 #initiating API connection and defining trade parameters
 token_path = "C:\\Oanda\\Tradebot\\token.txt"
@@ -75,7 +74,16 @@ def main():
             "0"
                 
 
-
+starttime=time.time()
+timeout = time.time() + (60*0)+60*10  # 60 seconds times 60 meaning the script will run for 1 hr
+while time.time() <= timeout:
+    try:
+        print("passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+        main()
+        time.sleep(15 - ((time.time() - starttime) % 15.0)) # orignial 300=5 minute interval between each new execution
+    except KeyboardInterrupt:
+        print('\n\nKeyboard exception received. Exiting.')
+        exit()
 # =============================================================================
 # main()
 #         
