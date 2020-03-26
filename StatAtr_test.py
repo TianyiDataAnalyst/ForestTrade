@@ -44,14 +44,17 @@ import oandapyV20.endpoints.orders as orders
 import statsmodels.api as sm
 import numpy as np
 import time
-import os
 import re
    
 for line in open('C:\\Oanda\\Tradebot\\final_delta_projected.txt'):
     pass
 print(line)    
-regex=re.findall(r'[0-9]+', line)
-final_delta_projected= ' '.join(map(str, regex[7:])) 
+regex=re.findall(r'(?<=value:).*?(?=\s)', line)
+final_delta_projected= ' '.join(map(str, regex)) 
+# =============================================================================
+# final_delta_projected_path = "C:\\Oanda\\Tradebot\\final_delta_projected.txt"
+# final_delta_projected = open(final_delta_projected_path,'r').read()
+# =============================================================================
 
 #
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
@@ -67,8 +70,6 @@ pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] 
 
 pos_size = 2000 
 
-final_delta_projected_path = "C:\\Oanda\\Tradebot\\final_delta_projected.txt"
-final_delta_projected = open(final_delta_projected_path,'r').read()
 
 StatArb_VALUE_FOR_BUY_ENTRY = 0.001
 

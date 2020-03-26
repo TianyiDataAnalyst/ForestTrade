@@ -9,7 +9,7 @@ import os
  
 def main():
     os.system('python C:\\Users\\gutia\\Documents\\GitHub\\ForestTrade\\StatAbit_strategy.py')
-
+# run 12 hours and trigger the file in every 15 minutes
 starttime=time.time()
 timeout = time.time() + (60*60*12)  # 60 seconds times 60 meaning the script will run for 1 hr
 while time.time() <= timeout:
