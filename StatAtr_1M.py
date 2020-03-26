@@ -44,7 +44,7 @@ import numpy as np
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
 
 #initiating API connection and defining trade parameters
-token_path = "/Users/tianyigu/Downloads/token.txt"
+token_path = "C:\\Oanda\\token.txt" # Windows system format: "C:\\Oanda\\token.txt"; "token.txt" in PyCharm; ios "/Users/tianyigu/Downloads/token.txt"
 client = oandapyV20.API(access_token=open(token_path,'r').read(),environment="practice")
 account_id = "101-002-9736246-001"
 
@@ -53,7 +53,7 @@ pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] 
 #pairs = ['EUR_JPY','USD_JPY','AUD_JPY','AUD_USD','AUD_NZD','NZD_USD']
 
 def candles(instrument):
-    params = {"count": 1500,"granularity": list(CandlestickGranularity)[4]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    params = {"count": 1500,"granularity": list(CandlestickGranularity)[9]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -203,9 +203,9 @@ open_pnl = 0  # Open/Unrealized PnL marked to market
 closed_pnl = 0  # Closed/Realized PnL so far
 
 # Constants that define strategy behavior/thresholds
-StatArb_VALUE_FOR_BUY_ENTRY = 0.01  # StatArb trading signal value aboe which to enter buy-orders/long-position
-StatArb_VALUE_FOR_SELL_ENTRY = -0.01  # StatArb trading signal value below which to enter sell-orders/short-position
-MIN_PRICE_MOVE_FROM_LAST_TRADE = 0.01  # Minimum price change since last trade before considering trading again, this is to prevent over-trading at/around same prices
+StatArb_VALUE_FOR_BUY_ENTRY = 0.001  # StatArb trading signal value aboe which to enter buy-orders/long-position
+StatArb_VALUE_FOR_SELL_ENTRY = -0.001  # StatArb trading signal value below which to enter sell-orders/short-position
+MIN_PRICE_MOVE_FROM_LAST_TRADE = 0.001  # Minimum price change since last trade before considering trading again, this is to prevent over-trading at/around same prices
 NUM_SHARES_PER_TRADE = 1000000  # Number of currency to buy/sell on every trade
 MIN_PROFIT_TO_CLOSE = 10  # Minimum Open/Unrealized profit at which to close positions and lock profits
 
