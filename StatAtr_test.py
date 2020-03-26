@@ -44,6 +44,15 @@ import oandapyV20.endpoints.orders as orders
 import statsmodels.api as sm
 import numpy as np
 import time
+import os
+import re
+   
+for line in open('C:\\Oanda\\Tradebot\\final_delta_projected.txt'):
+    pass
+print(line)    
+regex=re.findall(r'[0-9]+', line)
+final_delta_projected= ' '.join(map(str, regex[7:])) 
+
 #
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
 
@@ -61,9 +70,9 @@ pos_size = 2000
 final_delta_projected_path = "C:\\Oanda\\Tradebot\\final_delta_projected.txt"
 final_delta_projected = open(final_delta_projected_path,'r').read()
 
-StatArb_VALUE_FOR_BUY_ENTRY = 0.01
+StatArb_VALUE_FOR_BUY_ENTRY = 0.001
 
-StatArb_VALUE_FOR_SELL_ENTRY =0.01
+StatArb_VALUE_FOR_SELL_ENTRY =0.001
 
 def candles(instrument):
     params = {"count": 100,"granularity": list(CandlestickGranularity)[18]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
@@ -248,15 +257,13 @@ def main():
         else:
             print(currency, "not meet the trade critiers")
                 
-# =============================================================================
-# starttime=time.time()
-# timeout = time.time() + (60*0)+60*1  # 60 seconds times 60 meaning the script will run for 1 hr
-# while time.time() <= timeout:
-#     try:
-#         print("passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
-#         main()
-#         time.sleep(15 - ((time.time() - starttime) % 15.0)) # orignial 300=5 minute interval between each new execution
-#     except KeyboardInterrupt:
-#         print('\n\nKeyboard exception received. Exiting.')
-#         exit()
-# =============================================================================
+starttime=time.time()
+timeout = time.time() + (60*60*1  # 60 seconds times 60 meaning the script will run for 1 hr
+while time.time() <= timeout:
+    try:
+        print("passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+        main()
+        time.sleep(10*60 - ((time.time() - starttime) % 1.0*60)) # orignial 300=5 minute interval between each new execution
+    except KeyboardInterrupt:
+        print('\n\nKeyboard exception received. Exiting.')
+        exit()

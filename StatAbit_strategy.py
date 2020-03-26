@@ -42,6 +42,7 @@ import statistics as stats
 import oandapyV20.endpoints.orders as orders
 import numpy as np
 import time
+
 #
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
 
@@ -57,7 +58,7 @@ pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] 
 pos_size = 2000 
 
 def candles(instrument):
-    params = {"count": 1500,"granularity": list(CandlestickGranularity)[9]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    params = {"count": 1500,"granularity": list(CandlestickGranularity)[9]} #granularity is in 'M15'[9]; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -173,11 +174,11 @@ open_pnl = 0  # Open/Unrealized PnL marked to market
 closed_pnl = 0  # Closed/Realized PnL so far
 
 # Constants that define strategy behavior/thresholds
-StatArb_VALUE_FOR_BUY_ENTRY = 0.01  # StatArb trading signal value aboe which to enter buy-orders/long-position
-StatArb_VALUE_FOR_SELL_ENTRY = -0.01  # StatArb trading signal value below which to enter sell-orders/short-position
-MIN_PRICE_MOVE_FROM_LAST_TRADE = 0.01  # Minimum price change since last trade before considering trading again, this is to prevent over-trading at/around same prices
+StatArb_VALUE_FOR_BUY_ENTRY = 0.001  # StatArb trading signal value aboe which to enter buy-orders/long-position
+StatArb_VALUE_FOR_SELL_ENTRY = -0.001  # StatArb trading signal value below which to enter sell-orders/short-position
+MIN_PRICE_MOVE_FROM_LAST_TRADE = 0.001  # Minimum price change since last trade before considering trading again, this is to prevent over-trading at/around same prices
 NUM_SHARES_PER_TRADE = 1000000  # Number of currency to buy/sell on every trade
-MIN_PROFIT_TO_CLOSE = 10  # Minimum Open/Unrealized profit at which to close positions and lock profits
+MIN_PROFIT_TO_CLOSE = 1  # Minimum Open/Unrealized profit at which to close positions and lock profits
 
 
 # =============================================================================
@@ -370,14 +371,8 @@ for i in range(0, num_days):
 #output variable 
 
 f = open("C:\\Oanda\\Tradebot\\final_delta_projected.txt","a+")
-f.write(str(final_delta_projected))
+f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) +'  value: '+str(final_delta_projected)+ '\n')
 f.close
 
-def write_vars_to_file(_f, **vars):
-    for (name, val) in vars.items():
-        _f.write("%s = %s\n" % (name, repr(val)))
-import sys
-write_vars_to_file(sys.stdout, dict=str(final_delta_projected))
-dict
-        
-        
+print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) +'  value: '+str(final_delta_projected))
+

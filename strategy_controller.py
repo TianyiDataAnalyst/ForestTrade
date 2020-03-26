@@ -16,7 +16,7 @@ while time.time() <= timeout:
     try:
         print("passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
         main()
-        time.sleep(15*1 - ((time.time() - starttime) % 15.0*1)) # orignial 300=5 minute interval between each new execution
+        time.sleep(15*60 - ((time.time() - starttime) % 15.0*60)) # orignial 300=5 minute interval between each new execution
     except KeyboardInterrupt:
         print('\n\nKeyboard exception received. Exiting.')
         exit()
