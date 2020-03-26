@@ -258,12 +258,12 @@ def main():
             print(currency, "not meet the trade critiers")
                 
 starttime=time.time()
-timeout = time.time() + (60*60*1  # 60 seconds times 60 meaning the script will run for 1 hr
+timeout = time.time() + (60*60*1)  # 60 seconds times 60 meaning the script will run for 1 hr
 while time.time() <= timeout:
     try:
         print("passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
         main()
-        time.sleep(10*60 - ((time.time() - starttime) % 1.0*60)) # orignial 300=5 minute interval between each new execution
+        time.sleep(1*60 - ((time.time() - starttime) % 1.0*60)) # orignial 300=5 minute interval between each new execution
     except KeyboardInterrupt:
         print('\n\nKeyboard exception received. Exiting.')
         exit()
