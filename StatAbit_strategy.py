@@ -114,33 +114,19 @@ def clean_format(instrument):
 
 
 
-#dictionary structure:https://realpython.com/python-dicts/
-jpyusd = convert_currency('USD_JPY')
-#jpyusd['Open'].count()
-#jpyusd = jpyusd.assign(symbol=pd.Series('JPY_USD', index=jpyusd.index))
-#jpyusd_dict = jpyusd.groupby('symbol').apply(lambda dfg: dfg.drop('symbol', axis=1).to_dict(orient='list')).to_dict()
+#usdcad = clean_format('USD_CAD')
+audcad = clean_format('AUD_CAD')
+#eurcad = clean_format('EUR_CAD')
+nzdcad = clean_format('NZD_CAD')
+#spxusd = clean_format('SPX500_USD')
+#au200aud = clean_format('AU200_AUD')
 
-chfusd = convert_currency('USD_CHF')
+#symbols_data = {'USD_CAD' : usdcad, 'AUD_CAD': audcad, 'NZD_CAD':nzdcad,'SPX500_USD': spxusd, 'AU200_AUD': au200aud }  #'EUR_CAD': eurcad, is not corrolated
+symbols_data = {'AUD_CAD': audcad, 'NZD_CAD':nzdcad}
 
-#chfusd = chfusd.assign(symbol=pd.Series('CHF_USD', index=chfusd.index))
-#chfusd_dict = chfusd.groupby('symbol').apply(lambda dfg: dfg.drop('symbol', axis=1).to_dict(orient='list')).to_dict()
-
-audusd = clean_format('AUD_USD')
-#audusd['Open'].count()
-#audusd = audusd.assign(symbol=pd.Series('AUD_USD', index=audusd.index))
-#audusd_dict = audusd.groupby('symbol').apply(lambda dfg: dfg.drop('symbol', axis=1).to_dict(orient='list')).to_dict()
-
-#['GBP_USD','CAD_USD','EUR_USD','NZD_USD']
-cadusd = convert_currency('USD_CAD')
-
-gbpusd = clean_format('GBP_USD')
-eurusd = clean_format('EUR_USD')
-nzdusd = clean_format('NZD_USD')
-spxusd = clean_format('SPX500_USD')
-
-
-
-symbols_data = {'AUD_USD' : audusd, 'NZD_USD': nzdusd, 'CAD_USD': cadusd,'SPX500_USD': spxusd}
+TRADING_INSTRUMENT = 'NZD_CAD'
+#SYMBOLS = ['USD_CAD','AUD_CAD','NZD_CAD','AU200_AUD','SPX500_USD'] #,'SPX500_USD'
+SYMBOLS = ['NZD_CAD','AUD_CAD']
 #symbols_data = {  'JPY_USD': jpyusd, 'CHF_USD': chfusd, 'AUD_USD' : audusd, 'NZD_USD': nzdusd, 'EUR_USD': eurusd, 'GBP_USD': gbpusd, 'CAD_USD': cadusd}
 for symbol in SYMBOLS:
     data = symbols_data[symbol]

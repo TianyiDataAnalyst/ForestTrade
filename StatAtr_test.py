@@ -13,33 +13,12 @@ Created on Tue Feb 25 15:36:39 2020
 @author: gutia
 """
 
-# =============================================================================
-# import pandas as pd
-# from pandas_datareader import data
-# =============================================================================
-
-# Fetch daily data for 4 years
-# =============================================================================
-# SYMBOL='GOOG'
-# start_date = '2014-01-01'
-# end_date = '2018-01-01'
-# SRC_DATA_FILENAME=SYMBOL + '_data.pkl'
-# 
-# try:
-#  data = pd.read_pickle(SRC_DATA_FILENAME)
-# except FileNotFoundError:
-#  data = data.DataReader(SYMBOL, 'yahoo', start_date, end_date)
-#  data.to_pickle(SRC_DATA_FILENAME)
-# 
-# =============================================================================
 #data.head(4)
 import oandapyV20
 import oandapyV20.endpoints.instruments as instruments
 import oandapyV20.definitions.instruments as definstruments
 import pandas as pd
 #import matplotlib.pyplot as plt
-import statistics as stats
-import oandapyV20.endpoints.trades as trades
 import oandapyV20.endpoints.orders as orders
 import statsmodels.api as sm
 import numpy as np
@@ -50,7 +29,7 @@ for line in open('C:\\Oanda\\Tradebot\\final_delta_projected.txt'):
     pass
 print(line)    
 regex=re.findall(r'(?<=value:).*?(?=\s)', line)
-final_delta_projected= ' '.join(map(str, regex)) 
+final_delta_projected = ' '.join(map(str, regex)) 
 # =============================================================================
 # final_delta_projected_path = "C:\\Oanda\\Tradebot\\final_delta_projected.txt"
 # final_delta_projected = open(final_delta_projected_path,'r').read()
@@ -65,9 +44,10 @@ client = oandapyV20.API(access_token=open(token_path,'r').read(),environment="pr
 account_id = "101-002-9736246-001"
 
 #defining strategy parameters
-pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] #currency pairs to be included in the strategy
+#pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] #currency pairs to be included in the strategy
 #pairs = ['EUR_JPY','USD_JPY','AUD_JPY','AUD_USD','AUD_NZD','NZD_USD']
-
+pairs = ['USD_CAD']
+         
 pos_size = 2000 
 
 
@@ -76,7 +56,7 @@ StatArb_VALUE_FOR_BUY_ENTRY = 0.001
 StatArb_VALUE_FOR_SELL_ENTRY =0.001
 
 def candles(instrument):
-    params = {"count": 100,"granularity": list(CandlestickGranularity)[18]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    params = {"count": 100,"granularity": list(CandlestickGranularity)[9]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -116,7 +96,7 @@ def convert_currency(instrument):
     return _usd
 
 TRADING_INSTRUMENT = 'CAD_USD'
-SYMBOLS = ['AUD_USD','CAD_USD','NZD_USD','SPX500_USD']
+#SYMBOLS = ['AUD_USD','CAD_USD','NZD_USD','SPX500_USD']
 #SYMBOLS = ['AUD_USD','GBP_USD','CAD_USD','CHF_USD','EUR_USD','JPY_USD','NZD_USD']
 def clean_format(instrument):
     df = candles(instrument)
@@ -133,7 +113,7 @@ def clean_format(instrument):
 
 
 def candles_h3(instrument):
-    params = {"count": 200,"granularity": list(CandlestickGranularity)[13]} #granularity is in 'M5'; it can be in seconds S5 - S30, minutes M1 - M30[10], hours H1 - H12, 2M[5],4M[6] 5M[7],15M[9],H2[12]
+    params = {"count": 20,"granularity": list(CandlestickGranularity)[13]} #granularity is in 'M5'; it can be in seconds S5 - S30, minutes M1 - M30[10], hours H1 - H12, 2M[5],4M[6] 5M[7],15M[9],H2[12]
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -203,68 +183,66 @@ def market_order(instrument,units,sl):
     client.request(r)
 #market_order("USD_CAD","100","1.43")
 
+#n=20
 def ATR(DF,n):
     "function to calculate True Range and Average True Range"
     df = DF.copy()
     df['H-L']=abs(df['h']-df['l'])
     df['H-PC']=abs(df['h']-df['c'].shift(1))
     df['L-PC']=abs(df['l']-df['c'].shift(1))
-    df['TR']=df[['H-L','H-PC','L-PC']].max(axis=1,skipna=False)
+    df['TR']=df[['H-L','H-PC','L-PC']].max(axis=1,skipna=True)
     df['ATR'] = df['TR'].rolling(n).mean()
     #df['ATR'] = df['TR'].ewm(span=n,adjust=False,min_periods=n).mean()
     df2 = df.drop(['H-L','H-PC','L-PC'],axis=1)
-    return round(3*df2["ATR"][-1],5)
+    return round(3*df2['ATR'][-1],5)
 
 """
-data_h3 = candles_h3('CAD_JPY')
+df = candles_h3('USD_CAD')
+data_h3 = candles_h3('USD_CAD')
 ATR(data_h3,120)
 """
-# df = candles('EUR_USD')
 
-def trade_signal(df):
+def trade_signal():
     signal = ""
     #"function to generate signal"
     if float(final_delta_projected) > StatArb_VALUE_FOR_BUY_ENTRY:
         signal = "Buy"
-    if float(final_delta_projected) > StatArb_VALUE_FOR_SELL_ENTRY:
+    if float(final_delta_projected) < StatArb_VALUE_FOR_SELL_ENTRY:
         signal = "Sell"
     return signal
   
 def main():
-    global pairs
-    for currency in pairs:
-        if currency != "USD_CAD":
-            continue
-        print("analyzing ",currency)
-        data = candles(currency)
-        data_h3 = candles_h3(currency)
-        ohlc_df = stochastic(data,14,3,3)
-        ohlc_df = SMA(ohlc_df,100,200)
-        signal = trade_signal(ohlc_df)
-        if signal == "Buy":
-            market_order(currency,pos_size,str(ATR(data_h3,120)))
-            print("New long position initiated for ", currency)
-            f = open("C:\\Oanda\\Tradebot\\log.txt", "a+")
-            f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + "New long position initiated for " + currency + '\n' )
-            f.write("passthrough at " )
-            f.close()
-        elif signal == "Sell":
-            market_order(currency,-1*pos_size,str(ATR(data_h3,120)))
-            print("New short position initiated for ", currency)
-            f = open("C:\\Oanda\\Tradebot\\log.txt", "a+")
-            f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + "New long position initiated for " + currency + '\n' )
-            f.write("passthrough at " )
-            f.close()
-        else:
-            print(currency, "not meet the trade critiers")
+    currency ='NZD_CAD'
+    print("StatAtr_test script analyzing ",currency)
+    data = candles(currency)
+    data_h3 = candles_h3(currency)
+    ohlc_df = stochastic(data,14,3,3)
+    ohlc_df = SMA(ohlc_df,100,200)
+    signal = trade_signal()
+    if signal == "Buy":
+        market_order(currency,pos_size,str(ATR(data_h3,20)))
+        print("New long position initiated for ", currency)
+        f = open("C:\\Oanda\\Tradebot\\log.txt", "a+")
+        f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + "New long position initiated for " + currency + '\n' )
+        f.write("passthrough at " )
+        f.close()
+    elif signal == "Sell":
+        market_order(currency,-1*pos_size,str(ATR(data_h3,20)))
+        print("New short position initiated for ", currency)
+        f = open("C:\\Oanda\\Tradebot\\log.txt", "a+")
+        f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + "New long position initiated for " + currency + '\n' )
+        f.write("passthrough at " )
+        f.close()
+    else:
+        print(currency, "not meet the trade critiers")
                 
 starttime=time.time()
-timeout = time.time() + (60*60*1)  # 60 seconds times 60 meaning the script will run for 1 hr
+timeout = time.time() + (60*60*12)  # 60 seconds times 60 meaning the script will run for 1 hr
 while time.time() <= timeout:
     try:
         print("passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
         main()
-        time.sleep(1*60 - ((time.time() - starttime) % 1.0*60)) # orignial 300=5 minute interval between each new execution
+        time.sleep(15*60 - ((time.time() - starttime) % 15.0*60)) # orignial 300=5 minute interval between each new execution
     except KeyboardInterrupt:
         print('\n\nKeyboard exception received. Exiting.')
         exit()
