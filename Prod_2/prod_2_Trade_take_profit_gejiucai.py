@@ -4,7 +4,8 @@ Created on Thu Mar  5 15:20:54 2020
 
 @author: gutia
 """
-from config import oanda_login as account 
+from config import oanda_login as account
+from config import var_prod_2
 import oandapyV20
 import oandapyV20.endpoints.trades as trades
 import pandas as pd
@@ -12,24 +13,66 @@ import pandas as pd
 import numpy as np
 import time
 import oandapyV20.endpoints.forexlabs as labs
+import oandapyV20.endpoints.instruments as instruments
+import oandapyV20.definitions.instruments as definstruments
+
 #initiating API connection and defining trade parameters
-token_path = "C:\\Oanda\\Tradebot\\token.txt"
+CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
+
+#initiating API connection and defining trade parameters
+token_path = "C:\\Oanda\\token.txt" # Windows system format: "C:\\Oanda\\token.txt"; "token.txt" in PyCharm; ios "/Users/tianyigu/Downloads/token.txt"
 client = oandapyV20.API(access_token=open(token_path,'r').read(),environment="practice")
 account_id = account.oanda_pratice_account_id
 
 #Globle variable 
-trade_instrument = "NZD_CAD"
-NUM_SHARES_PER_TRADE = 2000 
+trade_instrument = var_prod_2.TRADING_INSTRUMENT
+NUM_SHARES_PER_TRADE = var_prod_2.NUM_SHARES_PER_TRADE 
 
+#defining strategy parameters
+#pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] #currency pairs to be included in the strategy
+#pairs = ['EUR_JPY','USD_JPY','AUD_JPY','AUD_USD','AUD_NZD','NZD_USD']
+
+def candles(instrument):
+    params = {"count": 50,"granularity": list(CandlestickGranularity)[4]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
+    client.request(candles)
+    ohlc_dict = candles.response["candles"]
+    ohlc = pd.DataFrame(ohlc_dict)
+    ohlc_df = ohlc.mid.dropna().apply(pd.Series)
+    ohlc_df["volume"] = ohlc["volume"]
+    ohlc_df.index = ohlc["time"]
+    ohlc_df = ohlc_df.apply(pd.to_numeric)
+    return ohlc_df
+
+def ATR(DF,n):
+    "function to calculate True Range and Average True Range"
+    df = DF.copy()
+    df['H-L']=abs(df['h']-df['l'])
+    df['H-PC']=abs(df['h']-df['c'].shift(1))
+    df['L-PC']=abs(df['l']-df['c'].shift(1))
+    df['TR']=df[['H-L','H-PC','L-PC']].max(axis=1,skipna=True)
+    df['ATR'] = df['TR'].rolling(n).mean()
+    #df['ATR'] = df['TR'].ewm(span=n,adjust=False,min_periods=n).mean()
+    df2 = df.drop(['H-L','H-PC','L-PC'],axis=1)
+    return round(3*df2['ATR'][-1],5)
+
+"""
+df = candles('USD_CAD')
+ATR(df,50)
+"""
+
+
+# https://developer.oanda.com/rest-live/forex-labs/#spreads
 def spread_check(): #average spread
     data = {
             "instrument": trade_instrument,
-            "period": 1
+            "period": 1  #period: 3600 - 1 hour. Required Period of time in seconds to retrieve spread data for. Values not in the following list will be automatically adjusted to the nearest valid value.
             }
     r = labs.Spreads(params=data)
     client.request(r)
     return r.response['avg'][-1][1]
 
+#cost = NUM_SHARES_PER_TRADE*spread_check()*0.0001
 
 def target_price(trade_id):
     df_open_trade= pd.DataFrame(client.request(trades.OpenTrades(accountID=account_id))['trades'])
@@ -66,38 +109,35 @@ def trade_close(trade_ID, curr_unit): #OANDA REST-V20 API Documentation,Page 67
         client.request(r)
         
 
-#trade_close('4179', '2000')
-
+#trade_close('6343','2000')
+#trade_id ='6352'
 def main():
     r = trades.OpenTrades(accountID=account_id)
     open_trades = client.request(r)['trades']
     trade_ids = []
     trade_id = []
-    try:
-        if len(open_trades)==0:
-            print("no open trade: " + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
-    except:
-        for i in range(len(open_trades)):
-            trade_ids.append(open_trades[i]['id'])
-        trade_id = [i for i in trade_ids if i not in trade_ids]
-        for trade_id in trade_ids:
+    if len(open_trades)==0:
+        print("no open trade: " + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))   
+    for i in range(len(open_trades)):
+        trade_ids.append(open_trades[i]['id'])
+    trade_id = [i for i in trade_ids if i not in trade_ids]
+    for trade_id in trade_ids:       
+        unit = NUM_SHARES_PER_TRADE
+        pnl = float(unrealizedPL_trade(trade_id))
+        pnl_value = var_prod_2.pnl_value
+        if pnl > pnl_value:
             print("Close trade:")
-            unit = 2000
-            pnl = float(unrealizedPL_trade(trade_id))
-            pnl_value = 0
-            if pnl > pnl_value:
-                print("ID:", trade_id, "Unit:", unit)
-                trade_close(trade_id, unit)
-            else: 
-                "0"
-                
+            print("ID:", trade_id, "Unit:", unit)
+            trade_close(trade_id, unit)
+ 
+
 starttime=time.time()
 timeout = time.time() + (60*60*12)  # 60 seconds times 60 meaning the script will run for 1 hr
 while time.time() <= timeout:
     try:
         print("Taking Profit script passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
         main()
-        time.sleep(5*1 - ((time.time() - starttime) % 5.0)) # orignial 300=5 minute interval between each new execution
+        time.sleep(10*1 - ((time.time() - starttime) % 10.0)) # orignial 300=5 minute interval between each new execution
     except KeyboardInterrupt:
         print('\n\nKeyboard exception received. Exiting.')
         exit()

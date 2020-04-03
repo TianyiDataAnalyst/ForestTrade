@@ -6,7 +6,6 @@ Created on Thu Mar 12 14:27:05 2020
 @author: tianyigu
 """
 
-#data.head(4)
 import oandapyV20
 import oandapyV20.endpoints.instruments as instruments
 import oandapyV20.definitions.instruments as definstruments
@@ -21,7 +20,7 @@ from config import oanda_login as account
 from config import var_prod_1
 
 def final_delta_projected():   
-    for line in open('C:\\Oanda\\Tradebot\\final_delta_projected.txt'):
+    for line in open("C:\\Users\\gutia\\Documents\\GitHub\\ForestTrade\\Prod_1\\prod_1_4_final_delta_projected.txt"):
         pass
     #print(line)    
     regex=re.findall(r'(?<=value:).*?(?=\s)', line)
@@ -218,7 +217,7 @@ def main():
     signal = trade_signal()
     if signal == "Buy":
         market_order(currency,pos_size,str(ATR(data_h3,20)))
-        print("New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected)
+        print("New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
         f = open("C:\\Oanda\\Tradebot\\log.txt", "a+")
         f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + "New long position initiated for " + currency + '\n' )
         f.write("passthrough at " )

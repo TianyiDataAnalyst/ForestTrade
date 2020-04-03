@@ -119,17 +119,30 @@ import re
 # dashes EXCEPT for the dash indicating + or - utc offset for the timezone
 last_row_date = (candles('EUR_USD').index)[-1]
 first_row_date = (candles('EUR_USD').index)[1]
+
+
+#date = '2020-04-01T19:01:00.000000000Z'
 def format_date(date):
     conformed_timestamp = re.sub(r"[:]|([-](?!((\d{2}[:]\d{2})|(\d{4}))$))", '', date)
     x_day = dt.date(int(conformed_timestamp[0:4]),int(conformed_timestamp[4:6]),int(conformed_timestamp[6:8])+1)
     return x_day
-end_date = format_date(last_row_date)
-start_date = format_date(first_row_date)
+
+
+def format_datetime(date):
+    conformed_timestamp = re.sub(r"[:]|([-](?!((\d{2}[:]\d{2})|(\d{4}))$))", '', date)
+    x_day = dt.datetime(int(conformed_timestamp[0:4]),int(conformed_timestamp[4:6]),int(conformed_timestamp[6:8]), int(conformed_timestamp[9:11]), int(conformed_timestamp[11:13]))
+    return x_day    
+end_date = format_datetime(last_row_date)
+start_date = format_datetime(first_row_date)
+#(end_date-start_date).days
+#(end_date-start_date).microseconds
+(end_date-start_date).seconds>90
+
 pd.to_datetime(start_date).tz_localize('US/Eastern')
 #dateutil.parser.parse((candles('EUR_USD').index)[-1])
-end_day = datetime.date.today()
+end_day = dt.date.today()
 #datetime.datetime.now().date()
-business_days_diff = np.busday_count(start_day, end_day)
+business_days_diff = np.busday_count(start_date, end_date)
 if business_days_diff>=1:
     print ("1 day")
 else:
