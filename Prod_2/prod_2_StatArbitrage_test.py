@@ -18,7 +18,7 @@ import numpy as np
 import time
 import re
 from config import oanda_login as account
-from config import var_prod_1
+from config import var_prod_2
 
 def final_delta_projected():   
     for line in open('C:\\Oanda\\Tradebot\\final_delta_projected.txt'):
@@ -45,11 +45,11 @@ account_id = account.oanda_pratice_account_id
 #pairs = ['EUR_JPY','USD_JPY','AUD_JPY','AUD_USD','AUD_NZD','NZD_USD']
 #pairs = ['USD_CAD']
          
-pos_size = var_prod_1.NUM_SHARES_PER_TRADE
+pos_size = var_prod_2.NUM_SHARES_PER_TRADE
 
-StatArb_VALUE_FOR_BUY_ENTRY = var_prod_1.VALUE_FOR_BUY_ENTRY
+StatArb_VALUE_FOR_BUY_ENTRY = var_prod_2.VALUE_FOR_BUY_ENTRY
 
-StatArb_VALUE_FOR_SELL_ENTRY = var_prod_1.VALUE_FOR_SELL_ENTRY
+StatArb_VALUE_FOR_SELL_ENTRY = var_prod_2.VALUE_FOR_SELL_ENTRY
 
 def candles(instrument):
     params = {"count": 100,"granularity": list(CandlestickGranularity)[9]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
@@ -218,7 +218,7 @@ def main():
     signal = trade_signal()
     if signal == "Buy":
         market_order(currency,pos_size,str(ATR(data_h3,20)))
-        print("New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected)
+        print("New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
         f = open("C:\\Oanda\\Tradebot\\log.txt", "a+")
         f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + "New long position initiated for " + currency + '\n' )
         f.write("passthrough at " )

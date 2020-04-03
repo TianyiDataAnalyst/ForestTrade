@@ -15,17 +15,18 @@ import statistics as stats
 import oandapyV20.endpoints.orders as orders
 import numpy as np
 import time
-
+from config import var_prod_1
+from config import oanda_login as account
 #
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
 
 #initiating API connection and defining trade parameters
 token_path = "C:\\Oanda\\token.txt" # Windows system format: "C:\\Oanda\\token.txt"; "token.txt" in PyCharm; ios "/Users/tianyigu/Downloads/token.txt"
 client = oandapyV20.API(access_token=open(token_path,'r').read(),environment="practice")
-account_id = "101-002-9736246-001"
+account_id = account.oanda_pratice_account_id
 
 #defining strategy parameters
-pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] #currency pairs to be included in the strategy
+#pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] #currency pairs to be included in the strategy
 #pairs = ['EUR_JPY','USD_JPY','AUD_JPY','AUD_USD','AUD_NZD','NZD_USD']
 
 pos_size = 2000 
@@ -70,8 +71,7 @@ def convert_currency(instrument):
     _usd['Volume'] = df['Volume']
     return _usd
 
-TRADING_INSTRUMENT = 'CAD_USD'
-SYMBOLS = ['AUD_USD','CAD_USD','NZD_USD','SPX500_USD']
+
 #SYMBOLS = ['AUD_USD','GBP_USD','CAD_USD','CHF_USD','EUR_USD','JPY_USD','NZD_USD']
 def clean_format(instrument):
     df = candles(instrument)
@@ -97,9 +97,9 @@ nzdcad = clean_format('NZD_CAD')
 #symbols_data = {'USD_CAD' : usdcad, 'AUD_CAD': audcad, 'NZD_CAD':nzdcad,'SPX500_USD': spxusd, 'AU200_AUD': au200aud }  #'EUR_CAD': eurcad, is not corrolated
 symbols_data = {'AUD_CAD': audcad, 'NZD_CAD':nzdcad}
 
-TRADING_INSTRUMENT = 'NZD_CAD'
-#SYMBOLS = ['USD_CAD','AUD_CAD','NZD_CAD','AU200_AUD','SPX500_USD'] #,'SPX500_USD'
+TRADING_INSTRUMENT = var_prod_1.TRADING_INSTRUMENT
 SYMBOLS = ['NZD_CAD','AUD_CAD']
+#SYMBOLS = ['USD_CAD','AUD_CAD','NZD_CAD','AU200_AUD','SPX500_USD'] #,'SPX500_USD'
 #symbols_data = {  'JPY_USD': jpyusd, 'CHF_USD': chfusd, 'AUD_USD' : audusd, 'NZD_USD': nzdusd, 'EUR_USD': eurusd, 'GBP_USD': gbpusd, 'CAD_USD': cadusd}
 for symbol in SYMBOLS:
     data = symbols_data[symbol]
@@ -118,7 +118,7 @@ delta_projected_actual_history = {} # history of differences between Projected C
 final_delta_projected_history = [] # history of differences between final Projected ClosePrice deviation for TRADING_INSTRUMENT and actual ClosePrice deviation
 
 # Variables for Trading Strategy trade, position & pnl management:
-orders = []  # Container for tracking buy/sell order, +1 for buy order, -1 for sell order, 0 for no-action
+#orders = []  # Container for tracking buy/sell order, +1 for buy order, -1 for sell order, 0 for no-action
 positions = []  # Container for tracking positions, +ve for long positions, -ve for short positions, 0 for flat/no position
 pnls = []  # Container for tracking total_pnls, this is the sum of closed_pnl i.e. pnls already locked in and open_pnl i.e. pnls for open-position marked to market price
 
@@ -329,7 +329,7 @@ for i in range(0, num_days):
 
 #output variable 
 
-f = open("C:\\Oanda\\Tradebot\\final_delta_projected.txt","a+")
+f = open("C:\\Users\\gutia\\Documents\\GitHub\\ForestTrade\\Prod_1\\prod_1_4_final_delta_projected.txt","a+")
 f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) +'  value: '+str(final_delta_projected)+ '\n')
 f.close
 
