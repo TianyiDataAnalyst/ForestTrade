@@ -13,15 +13,15 @@ import pandas as pd
 #import matplotlib.pyplot as plt
 import statistics as stats
 import numpy as np
-import time
-from config import var_prod_1
-from config import oanda_login as account
+#import time
+from ForestTrade.config import var_prod_1
+from ForestTrade.config import oanda_login as account
+from ForestTrade.config import token
 #
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
 
 #initiating API connection and defining trade parameters
-token_path = "C:\\Oanda\\token.txt" # Windows system format: "C:\\Oanda\\token.txt"; "token.txt" in PyCharm; ios "/Users/tianyigu/Downloads/token.txt"
-client = oandapyV20.API(access_token=open(token_path,'r').read(),environment="practice")
+client = oandapyV20.API(token.token,environment="practice")
 account_id = account.oanda_pratice_account_id
 
 #defining strategy parameters
@@ -246,56 +246,58 @@ for i in range(0, num_days):
     final_delta_projected = 0
 
   final_delta_projected_history.append(final_delta_projected)
-
 # =============================================================================
-# StatArb execution logic
+# 
+# # =============================================================================
+# # StatArb execution logic
+# # =============================================================================
+# 
+#   # 1
+#   # This section checks trading signal against trading parameters/thresholds and positions, to trade.
+#   #
+#   # We will perform a sell trade at close_prices if the following conditions are met:
+#   # 1. The StatArb trading signal value is below Sell-Entry threshold and the difference between last trade-price and current-price is different enough.
+#   # 2. We are long( +ve position ) and current position is profitable enough to lock profit.
+#   if ((final_delta_projected < StatArb_VALUE_FOR_SELL_ENTRY and abs(close_price - last_sell_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE)  # StatArb above sell entry threshold, we should sell
+#       or
+#       (position > 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))):  # long from -ve StatArb and StatArb has gone positive or position is profitable, sell to close position
+#     orders.append(-1)  # mark the sell trade
+#     last_sell_price = close_price
+#     position -= NUM_SHARES_PER_TRADE  # reduce position by the size of this trade
+#     sell_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update vwap sell-price
+#     sell_sum_qty += NUM_SHARES_PER_TRADE
+#     #simulate trade
+#     #print trade result 
+# # =============================================================================
+# #     print("Sell ", NUM_SHARES_PER_TRADE, " @ ", close_price, "Position: ", position)
+# #     print("OpenPnL: ", open_pnl, " ClosedPnL: ", closed_pnl, " TotalPnL: ", (open_pnl + closed_pnl))
+# # =============================================================================
+# 
+#   # 2
+#   # We will perform a buy trade at close_prices if the following conditions are met:
+#   # 1. The StatArb trading signal value is above Buy-Entry threshold and the difference between last trade-price and current-price is different enough.
+#   # 2. We are short( -ve position ) and current position is profitable enough to lock profit.
+#   elif ((final_delta_projected > StatArb_VALUE_FOR_BUY_ENTRY and abs(close_price - last_buy_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE)  # StatArb below buy entry threshold, we should buy
+#         or
+#         (position < 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))):  # short from +ve StatArb and StatArb has gone negative or position is profitable, buy to close position
+#     orders.append(+1)  # mark the buy trade
+#     last_buy_price = close_price
+#     position += NUM_SHARES_PER_TRADE  # increase position by the size of this trade
+#     buy_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update the vwap buy-price
+#     buy_sum_qty += NUM_SHARES_PER_TRADE
+#     #simulate trade
+#     #print trade result    
+# # =============================================================================
+# #     print("Buy ", NUM_SHARES_PER_TRADE, " @ ", close_price, "Position: ", position)
+# #     print("OpenPnL: ", open_pnl, " ClosedPnL: ", closed_pnl, " TotalPnL: ", (open_pnl + closed_pnl))
+# # =============================================================================
+#   else:
+#     # No trade since none of the conditions were met to buy or sell
+#     orders.append(0)
+# 
+#   positions.append(position)
+# 
 # =============================================================================
-
-  # 1
-  # This section checks trading signal against trading parameters/thresholds and positions, to trade.
-  #
-  # We will perform a sell trade at close_prices if the following conditions are met:
-  # 1. The StatArb trading signal value is below Sell-Entry threshold and the difference between last trade-price and current-price is different enough.
-  # 2. We are long( +ve position ) and current position is profitable enough to lock profit.
-  if ((final_delta_projected < StatArb_VALUE_FOR_SELL_ENTRY and abs(close_price - last_sell_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE)  # StatArb above sell entry threshold, we should sell
-      or
-      (position > 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))):  # long from -ve StatArb and StatArb has gone positive or position is profitable, sell to close position
-    orders.append(-1)  # mark the sell trade
-    last_sell_price = close_price
-    position -= NUM_SHARES_PER_TRADE  # reduce position by the size of this trade
-    sell_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update vwap sell-price
-    sell_sum_qty += NUM_SHARES_PER_TRADE
-    #simulate trade
-    #print trade result 
-# =============================================================================
-#     print("Sell ", NUM_SHARES_PER_TRADE, " @ ", close_price, "Position: ", position)
-#     print("OpenPnL: ", open_pnl, " ClosedPnL: ", closed_pnl, " TotalPnL: ", (open_pnl + closed_pnl))
-# =============================================================================
-
-  # 2
-  # We will perform a buy trade at close_prices if the following conditions are met:
-  # 1. The StatArb trading signal value is above Buy-Entry threshold and the difference between last trade-price and current-price is different enough.
-  # 2. We are short( -ve position ) and current position is profitable enough to lock profit.
-  elif ((final_delta_projected > StatArb_VALUE_FOR_BUY_ENTRY and abs(close_price - last_buy_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE)  # StatArb below buy entry threshold, we should buy
-        or
-        (position < 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))):  # short from +ve StatArb and StatArb has gone negative or position is profitable, buy to close position
-    orders.append(+1)  # mark the buy trade
-    last_buy_price = close_price
-    position += NUM_SHARES_PER_TRADE  # increase position by the size of this trade
-    buy_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update the vwap buy-price
-    buy_sum_qty += NUM_SHARES_PER_TRADE
-    #simulate trade
-    #print trade result    
-# =============================================================================
-#     print("Buy ", NUM_SHARES_PER_TRADE, " @ ", close_price, "Position: ", position)
-#     print("OpenPnL: ", open_pnl, " ClosedPnL: ", closed_pnl, " TotalPnL: ", (open_pnl + closed_pnl))
-# =============================================================================
-  else:
-    # No trade since none of the conditions were met to buy or sell
-    orders.append(0)
-
-  positions.append(position)
-
   #3
   """
   Finally, let's also look at the position management and PnL update logic, very similar to previous trading strategies:
@@ -325,12 +327,23 @@ for i in range(0, num_days):
   pnls.append(closed_pnl + open_pnl)
 
 #output variable
-def output_delta():
-    output_value = final_delta_projected
-    f = open("C:\\Users\\gutia\\Documents\\GitHub\\ForestTrade\\Prod_1\\prod_1_4_final_delta_projected.txt","a+")
-    f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) +'  value: '+str(output_value)+ '\n')
-    f.close
-
-output_delta()
-
-
+# =============================================================================
+# def output_delta():
+#     output_value = final_delta_projected
+#     f = open("prod_1_4_final_delta_projected.txt","a+")
+#     f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) +'  value: '+str(output_value)+ '\n')
+#     f.close
+# 
+# 
+# # run 12 hours and trigger the file in every 15 minutes
+# starttime=time.time()
+# timeout = time.time() + (60*60*12)  # 60 seconds times 60 meaning the script will run for 1 hr
+# while time.time() <= timeout:
+#     try:
+#         print("Strategy_controler script passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+#         output_delta()
+#         time.sleep(15*60 - ((time.time() - starttime) % 15.0*60)) # orignial 300=5 minute interval between each new execution
+#     except KeyboardInterrupt:
+#         print('\n\nKeyboard exception received. Exiting.')
+#         exit()
+# =============================================================================

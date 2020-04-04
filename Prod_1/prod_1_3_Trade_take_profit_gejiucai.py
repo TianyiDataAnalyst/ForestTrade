@@ -4,8 +4,7 @@ Created on Thu Mar  5 15:20:54 2020
 
 @author: gutia
 """
-from config import oanda_login as account
-from config import var_prod_1
+
 import oandapyV20
 import oandapyV20.endpoints.trades as trades
 import pandas as pd
@@ -18,6 +17,10 @@ import oandapyV20.definitions.instruments as definstruments
 import oandapyV20.endpoints.pricing as pricing
 import datetime as dt
 import re
+from ForestTrade.config import token
+from ForestTrade.config import oanda_login as account
+from ForestTrade.config import var_prod_1
+from ForestTrade.file_directory import file_name
 
 # =============================================================================
 # pd.set_option('display.max_rows', 1000) 
@@ -29,8 +32,7 @@ import re
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
 
 #initiating API connection and defining trade parameters
-token_path = "C:\\Oanda\\token.txt" # Windows system format: "C:\\Oanda\\token.txt"; "token.txt" in PyCharm; ios "/Users/tianyigu/Downloads/token.txt"
-client = oandapyV20.API(access_token=open(token_path,'r').read(),environment="practice")
+client = oandapyV20.API(token.token,environment="practice")
 account_id = account.oanda_pratice_account_id
 
 #Globle variable 
@@ -167,7 +169,7 @@ def main():
             print("Close trade:")
             print("ID:", trade_id, "Unit:", unit)
             trade_close(trade_id, unit)
-            f = open("C:\\Users\\gutia\\Documents\\GitHub\\ForestTrade\\Prod_1\\prod_1_pnl.txt","a+")
+            f = open(file_name('log\\prod_1_pnl.txt'),"a+")
             f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) +", trade_id:" +str(trade_id)+',  pnl: '+str(pnl)+ '\n')
             f.close
  

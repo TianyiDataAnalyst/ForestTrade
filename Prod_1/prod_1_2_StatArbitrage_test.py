@@ -15,28 +15,18 @@ import oandapyV20.endpoints.orders as orders
 import statsmodels.api as sm
 import numpy as np
 import time
-import re
-from config import oanda_login as account
-from config import var_prod_1
-
-def final_delta_projected():   
-    for line in open("C:\\Users\\gutia\\Documents\\GitHub\\ForestTrade\\Prod_1\\prod_1_4_final_delta_projected.txt"):
-        pass
-    #print(line)    
-    regex=re.findall(r'(?<=value:).*?(?=\s)', line)
-    final_delta_projected = ' '.join(map(str, regex))
-    return final_delta_projected
-# =============================================================================
-# final_delta_projected_path = "C:\\Oanda\\Tradebot\\final_delta_projected.txt"
-# final_delta_projected = open(final_delta_projected_path,'r').read()
-# =============================================================================
+#import re
+from ForestTrade.config import oanda_login as account
+from ForestTrade.config import token
+from ForestTrade.config import var_prod_1
+from ForestTrade.file_directory import file_name
+from ForestTrade.Prod_1.prod_1_1_2_StatArbitrage_strategy import final_delta_projected
 
 #
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
 
 #initiating API connection and defining trade parameters
-token_path = "C:\\Oanda\\token.txt" # Windows system format: "C:\\Oanda\\token.txt"; "token.txt" in PyCharm; ios "/Users/tianyigu/Downloads/token.txt"
-client = oandapyV20.API(access_token=open(token_path,'r').read(),environment="practice")
+client = oandapyV20.API(str(token.token),environment="practice")
 account_id = account.oanda_pratice_account_id
 
 #defining strategy parameters
@@ -159,7 +149,6 @@ data.iloc[:,[3,5]].plot(subplots=True, layout = (2,1))
 
 def market_order(instrument,units,sl):
     #"""units can be positive or negative, stop loss (in pips) added/subtracted to price """  
-    account_id = "101-002-9736246-001"
     data = {
             "order": {
             "price": "",
@@ -200,10 +189,9 @@ ATR(data_h3,120)
 def trade_signal():
     signal = ""
     #"function to generate signal"
-    final_delta_projected_1 = final_delta_projected()
-    if float(final_delta_projected_1) > StatArb_VALUE_FOR_BUY_ENTRY:
+    if float(final_delta_projected) > StatArb_VALUE_FOR_BUY_ENTRY:
         signal = "Buy"
-    if float(final_delta_projected_1) < StatArb_VALUE_FOR_SELL_ENTRY:
+    if float(final_delta_projected) < StatArb_VALUE_FOR_SELL_ENTRY:
         signal = "Sell"
     return signal
   
@@ -217,20 +205,18 @@ def main():
     signal = trade_signal()
     if signal == "Buy":
         market_order(currency,pos_size,str(ATR(data_h3,20)))
-        print("New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
-        f = open("C:\\Oanda\\Tradebot\\log.txt", "a+")
-        f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + "New long position initiated for " + currency + '\n' )
-        f.write("passthrough at " )
+        print("New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected)
+        f = open(file_name('log\\trade_log.txt'), "a+")
+        f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + " New long position initiated for " + currency + '\n' )
         f.close()
     elif signal == "Sell":
         market_order(currency,-1*pos_size,str(ATR(data_h3,20)))
-        print("New short position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
-        f = open("C:\\Oanda\\Tradebot\\log.txt", "a+")
-        f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + "New short position initiated for " + currency + '\n' )
-        f.write("passthrough at " )
+        print("New short position initiated for ", currency, " final_delta_projected: ", final_delta_projected)
+        f = open(file_name('log\\trade_log.txt'), "a+")
+        f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + " New short position initiated for " + currency + '\n' )
         f.close()
     else:
-        print(currency, "not meet the trade critiers", " final_delta_projected: ", final_delta_projected())
+        print(currency, "not meet the trade critiers", " final_delta_projected: ", final_delta_projected)
                 
 starttime=time.time()
 timeout = time.time() + (60*60*12)  # 60 seconds times 60 meaning the script will run for 1 hr
@@ -242,3 +228,4 @@ while time.time() <= timeout:
     except KeyboardInterrupt:
         print('\n\nKeyboard exception received. Exiting.')
         exit()
+

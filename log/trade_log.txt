@@ -1,0 +1,2 @@
+2020-04-03 19:28:46 New short position initiated for NZD_CAD
+2020-04-03 19:28:59 New long position initiated for NZD_CAD
