@@ -5,7 +5,7 @@ Created on Fri Mar 27 18:53:23 2020
 @author: gutia
 """
 
-NUM_SHARES_PER_TRADE =2000
+NUM_SHARES_PER_TRADE =200
 
 VALUE_FOR_BUY_ENTRY = 0.001
 

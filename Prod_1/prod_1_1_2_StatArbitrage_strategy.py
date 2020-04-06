@@ -43,6 +43,30 @@ def candles(instrument):
     return ohlc_df
 #candles('USD_CAD')
 
+def candles_h3(instrument):
+    params = {"count": 20,"granularity": list(CandlestickGranularity)[13]} #granularity is in 'M5'; it can be in seconds S5 - S30, minutes M1 - M30[10], hours H1 - H12, 2M[5],4M[6] 5M[7],15M[9],H2[12]
+    candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
+    client.request(candles)
+    ohlc_dict = candles.response["candles"]
+    ohlc = pd.DataFrame(ohlc_dict)
+    ohlc_df = ohlc.mid.dropna().apply(pd.Series)
+    ohlc_df["volume"] = ohlc["volume"]
+    ohlc_df.index = ohlc["time"]
+    ohlc_m15_df = ohlc_df.apply(pd.to_numeric)
+    return ohlc_m15_df
+
+def ATR(DF,n):
+    "function to calculate True Range and Average True Range"
+    df = DF.copy()
+    df['H-L']=abs(df['h']-df['l'])
+    df['H-PC']=abs(df['h']-df['c'].shift(1))
+    df['L-PC']=abs(df['l']-df['c'].shift(1))
+    df['TR']=df[['H-L','H-PC','L-PC']].max(axis=1,skipna=True)
+    df['ATR'] = df['TR'].rolling(n).mean()
+    #df['ATR'] = df['TR'].ewm(span=n,adjust=False,min_periods=n).mean()
+    df2 = df.drop(['H-L','H-PC','L-PC'],axis=1)
+    return round(3*df2['ATR'][-1],5)
+
 # =============================================================================
 # def reverse_base_curr(instrument, data):
 #   data = candles(instrument)
@@ -132,12 +156,11 @@ open_pnl = 0  # Open/Unrealized PnL marked to market
 closed_pnl = 0  # Closed/Realized PnL so far
 
 # Constants that define strategy behavior/thresholds
-StatArb_VALUE_FOR_BUY_ENTRY = 0.001  # StatArb trading signal value aboe which to enter buy-orders/long-position
-StatArb_VALUE_FOR_SELL_ENTRY = -0.001  # StatArb trading signal value below which to enter sell-orders/short-position
-MIN_PRICE_MOVE_FROM_LAST_TRADE = 0.001  # Minimum price change since last trade before considering trading again, this is to prevent over-trading at/around same prices
-NUM_SHARES_PER_TRADE = 1000000  # Number of currency to buy/sell on every trade
-MIN_PROFIT_TO_CLOSE = 1  # Minimum Open/Unrealized profit at which to close positions and lock profits
-
+StatArb_VALUE_FOR_BUY_ENTRY = var_prod_1.VALUE_FOR_BUY_ENTRY  # StatArb trading signal value aboe which to enter buy-orders/long-position
+StatArb_VALUE_FOR_SELL_ENTRY = var_prod_1.VALUE_FOR_SELL_ENTRY  # StatArb trading signal value below which to enter sell-orders/short-position
+MIN_PRICE_MOVE_FROM_LAST_TRADE = 0  # Minimum price change since last trade before considering trading again, this is to prevent over-trading at/around same prices
+NUM_SHARES_PER_TRADE = var_prod_1.NUM_SHARES_PER_TRADE  # Number of currency to buy/sell on every trade
+MIN_PROFIT_TO_CLOSE = var_prod_1.pnl_value  # Minimum Open/Unrealized profit at which to close positions and lock profits
 
 # =============================================================================
 # Quantifying and computing StatArb trading signals
@@ -298,33 +321,35 @@ for i in range(0, num_days):
 #   positions.append(position)
 # 
 # =============================================================================
-  #3
-  """
-  Finally, let's also look at the position management and PnL update logic, very similar to previous trading strategies:
-  """
-  # This section updates Open/Unrealized & Closed/Realized positions
-  open_pnl = 0
-  if position > 0:
-    if sell_sum_qty > 0:  # long position and some sell trades have been made against it, close that amount based on how much was sold against this long position
-      open_pnl = abs(sell_sum_qty) * (sell_sum_price_qty / sell_sum_qty - buy_sum_price_qty / buy_sum_qty)
-    # mark the remaining position to market i.e. pnl would be what it would be if we closed at current price
-    open_pnl += abs(sell_sum_qty - position) * (close_price - buy_sum_price_qty / buy_sum_qty)
-  elif position < 0:
-    if buy_sum_qty > 0:  # short position and some buy trades have been made against it, close that amount based on how much was bought against this short position
-      open_pnl = abs(buy_sum_qty) * (sell_sum_price_qty / sell_sum_qty - buy_sum_price_qty / buy_sum_qty)
-    # mark the remaining position to market i.e. pnl would be what it would be if we closed at current price
-    open_pnl += abs(buy_sum_qty - position) * (sell_sum_price_qty / sell_sum_qty - close_price)
-  else:
-    # flat, so update closed_pnl and reset tracking variables for positions & pnls
-    closed_pnl += (sell_sum_price_qty - buy_sum_price_qty)
-    buy_sum_price_qty = 0
-    buy_sum_qty = 0
-    sell_sum_price_qty = 0
-    sell_sum_qty = 0
-    last_buy_price = 0
-    last_sell_price = 0
-
-  pnls.append(closed_pnl + open_pnl)
+# =============================================================================
+#   #3
+#   """
+#   Finally, let's also look at the position management and PnL update logic, very similar to previous trading strategies:
+#   """
+#   # This section updates Open/Unrealized & Closed/Realized positions
+#   open_pnl = 0
+#   if position > 0:
+#     if sell_sum_qty > 0:  # long position and some sell trades have been made against it, close that amount based on how much was sold against this long position
+#       open_pnl = abs(sell_sum_qty) * (sell_sum_price_qty / sell_sum_qty - buy_sum_price_qty / buy_sum_qty)
+#     # mark the remaining position to market i.e. pnl would be what it would be if we closed at current price
+#     open_pnl += abs(sell_sum_qty - position) * (close_price - buy_sum_price_qty / buy_sum_qty)
+#   elif position < 0:
+#     if buy_sum_qty > 0:  # short position and some buy trades have been made against it, close that amount based on how much was bought against this short position
+#       open_pnl = abs(buy_sum_qty) * (sell_sum_price_qty / sell_sum_qty - buy_sum_price_qty / buy_sum_qty)
+#     # mark the remaining position to market i.e. pnl would be what it would be if we closed at current price
+#     open_pnl += abs(buy_sum_qty - position) * (sell_sum_price_qty / sell_sum_qty - close_price)
+#   else:
+#     # flat, so update closed_pnl and reset tracking variables for positions & pnls
+#     closed_pnl += (sell_sum_price_qty - buy_sum_price_qty)
+#     buy_sum_price_qty = 0
+#     buy_sum_qty = 0
+#     sell_sum_price_qty = 0
+#     sell_sum_qty = 0
+#     last_buy_price = 0
+#     last_sell_price = 0
+# 
+#   pnls.append(closed_pnl + open_pnl)
+# =============================================================================
 
 #output variable
 # =============================================================================

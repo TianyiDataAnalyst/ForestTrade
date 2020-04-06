@@ -12,10 +12,7 @@ import oandapyV20.definitions.instruments as definstruments
 import pandas as pd
 #import matplotlib.pyplot as plt
 import oandapyV20.endpoints.orders as orders
-import statsmodels.api as sm
-import numpy as np
 import time
-#import re
 from ForestTrade.config import oanda_login as account
 from ForestTrade.config import token
 from ForestTrade.config import var_prod_1
@@ -29,10 +26,8 @@ CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.ke
 client = oandapyV20.API(str(token.token),environment="practice")
 account_id = account.oanda_pratice_account_id
 
-#defining strategy parameters
-#pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] #currency pairs to be included in the strategy
-#pairs = ['EUR_JPY','USD_JPY','AUD_JPY','AUD_USD','AUD_NZD','NZD_USD']
-#pairs = ['USD_CAD']
+
+TRADING_INSTRUMENT = var_prod_1.TRADING_INSTRUMENT
          
 pos_size = var_prod_1.NUM_SHARES_PER_TRADE
 
@@ -51,38 +46,8 @@ def candles(instrument):
     ohlc_df.index = ohlc["time"]
     ohlc_df = ohlc_df.apply(pd.to_numeric)
     return ohlc_df
-#candles('USD_CAD')
 
-# =============================================================================
-# def reverse_base_curr(instrument, data):
-#   data = candles(instrument)
-#   usd_array = pairs
-#     if any("USD_" in i for i in usd_array):
-# =============================================================================
-def convert_currency(instrument):
-    df = candles(instrument)
-    #df.index = pd.to_datetime(df.index) # change datetime to date, NOTE if granularity is less than day please delete
-    df = df.reset_index()
-    df.columns= ['Date','Open','High','Low','Close','Volume']
-    #df.Date = pd.to_datetime(df.Date,format='%d.%m.%Y %H:%M:%S.%f')
-    #df['Date'] = df['Date'].dt.date
-    df = df.set_index(df.Date)
-    df = df[['Open','High','Low','Close','Volume']]
-    df = df.drop_duplicates(keep=False)
-    
-    _usd = []
-    _usd= pd.DataFrame(_usd)
-    
-    _usd['Open'] = round(1/df['Open'],5)
-    _usd['High'] = round(1/df['High'],5)   
-    _usd['Low'] = round(1/df['Low'],5)
-    _usd['Close'] = round(1/df['Close'],5)
-    _usd['Volume'] = df['Volume']
-    return _usd
 
-TRADING_INSTRUMENT = 'CAD_USD'
-#SYMBOLS = ['AUD_USD','CAD_USD','NZD_USD','SPX500_USD']
-#SYMBOLS = ['AUD_USD','GBP_USD','CAD_USD','CHF_USD','EUR_USD','JPY_USD','NZD_USD']
 def clean_format(instrument):
     df = candles(instrument)
     #df.index = pd.to_datetime(df.index) # change datetime to date, NOTE if granularity is less than day please delete
@@ -96,7 +61,6 @@ def clean_format(instrument):
     return df
 
 
-
 def candles_h3(instrument):
     params = {"count": 20,"granularity": list(CandlestickGranularity)[13]} #granularity is in 'M5'; it can be in seconds S5 - S30, minutes M1 - M30[10], hours H1 - H12, 2M[5],4M[6] 5M[7],15M[9],H2[12]
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
@@ -108,44 +72,6 @@ def candles_h3(instrument):
     ohlc_df.index = ohlc["time"]
     ohlc_m15_df = ohlc_df.apply(pd.to_numeric)
     return ohlc_m15_df
-
-#candles_m5('EUR_USD')['l'].tail(1)
-#candles_h3('EUR_USD')['l'].tail(1) #3hours lowest point
-
-def stochastic(df,a,b,c):
-    #"function to calculate stochastic"
-    df['k']=((df['c'] - df['l'].rolling(a).min())/(df['h'].rolling(a).max()-df['l'].rolling(a).min()))*100
-    df['K']=df['k'].rolling(b).mean() 
-    df['D']=df['K'].rolling(c).mean()
-    return df
-
-def SMA(df,a,b):
-    #"function to calculate stochastic"
-    df['sma_fast']=df['c'].rolling(a).mean() 
-    df['sma_slow']=df['c'].rolling(b).mean() 
-    return df
-
-def slope(ser,n):
-    #"function to calculate the slope of n consecutive points on a plot"
-    slopes = [i*0 for i in range(n-1)]
-    for i in range(n,len(ser)+1):
-        y = ser[i-n:i]
-        x = np.array(range(n))
-        y_scaled = (y - y.min())/(y.max() - y.min())
-        x_scaled = (x - x.min())/(x.max() - x.min())
-        x_scaled = sm.add_constant(x_scaled)
-        model = sm.OLS(y_scaled,x_scaled)
-        results = model.fit()
-        slopes.append(results.params[-1])
-    slope_angle = (np.rad2deg(np.arctan(np.array(slopes))))
-    return np.array(slope_angle)
-"""
-df = candles('EUR_USD')
-df["slope"] = slope(data["c"],5)
-df["slope"].tail(1)
-
-data.iloc[:,[3,5]].plot(subplots=True, layout = (2,1))
-"""
 
 def market_order(instrument,units,sl):
     #"""units can be positive or negative, stop loss (in pips) added/subtracted to price """  
@@ -165,7 +91,6 @@ def market_order(instrument,units,sl):
             }
     r = orders.OrderCreate(accountID=account_id, data=data)
     client.request(r)
-#market_order("USD_CAD","100","1.43")
 
 #n=20
 def ATR(DF,n):
@@ -196,12 +121,9 @@ def trade_signal():
     return signal
   
 def main():
-    currency ='NZD_CAD'
+    currency =TRADING_INSTRUMENT
     print("StatAtr_test script analyzing ",currency)
-    data = candles(currency)
     data_h3 = candles_h3(currency)
-    ohlc_df = stochastic(data,14,3,3)
-    ohlc_df = SMA(ohlc_df,100,200)
     signal = trade_signal()
     if signal == "Buy":
         market_order(currency,pos_size,str(ATR(data_h3,20)))
