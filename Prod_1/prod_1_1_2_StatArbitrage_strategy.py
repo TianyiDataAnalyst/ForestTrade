@@ -31,7 +31,7 @@ account_id = account.oanda_pratice_account_id
 pos_size = 2000 
 
 def candles(instrument):
-    params = {"count": 1500,"granularity": list(CandlestickGranularity)[9]} #granularity is in 'M15'[9]; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    params = {"count": 1500,"granularity": list(CandlestickGranularity)[5]} #granularity is in 'M15'[9]; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -269,87 +269,14 @@ for i in range(0, num_days):
     final_delta_projected = 0
 
   final_delta_projected_history.append(final_delta_projected)
-# =============================================================================
-# 
-# # =============================================================================
-# # StatArb execution logic
-# # =============================================================================
-# 
-#   # 1
-#   # This section checks trading signal against trading parameters/thresholds and positions, to trade.
-#   #
-#   # We will perform a sell trade at close_prices if the following conditions are met:
-#   # 1. The StatArb trading signal value is below Sell-Entry threshold and the difference between last trade-price and current-price is different enough.
-#   # 2. We are long( +ve position ) and current position is profitable enough to lock profit.
-#   if ((final_delta_projected < StatArb_VALUE_FOR_SELL_ENTRY and abs(close_price - last_sell_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE)  # StatArb above sell entry threshold, we should sell
-#       or
-#       (position > 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))):  # long from -ve StatArb and StatArb has gone positive or position is profitable, sell to close position
-#     orders.append(-1)  # mark the sell trade
-#     last_sell_price = close_price
-#     position -= NUM_SHARES_PER_TRADE  # reduce position by the size of this trade
-#     sell_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update vwap sell-price
-#     sell_sum_qty += NUM_SHARES_PER_TRADE
-#     #simulate trade
-#     #print trade result 
-# # =============================================================================
-# #     print("Sell ", NUM_SHARES_PER_TRADE, " @ ", close_price, "Position: ", position)
-# #     print("OpenPnL: ", open_pnl, " ClosedPnL: ", closed_pnl, " TotalPnL: ", (open_pnl + closed_pnl))
-# # =============================================================================
-# 
-#   # 2
-#   # We will perform a buy trade at close_prices if the following conditions are met:
-#   # 1. The StatArb trading signal value is above Buy-Entry threshold and the difference between last trade-price and current-price is different enough.
-#   # 2. We are short( -ve position ) and current position is profitable enough to lock profit.
-#   elif ((final_delta_projected > StatArb_VALUE_FOR_BUY_ENTRY and abs(close_price - last_buy_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE)  # StatArb below buy entry threshold, we should buy
-#         or
-#         (position < 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))):  # short from +ve StatArb and StatArb has gone negative or position is profitable, buy to close position
-#     orders.append(+1)  # mark the buy trade
-#     last_buy_price = close_price
-#     position += NUM_SHARES_PER_TRADE  # increase position by the size of this trade
-#     buy_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update the vwap buy-price
-#     buy_sum_qty += NUM_SHARES_PER_TRADE
-#     #simulate trade
-#     #print trade result    
-# # =============================================================================
-# #     print("Buy ", NUM_SHARES_PER_TRADE, " @ ", close_price, "Position: ", position)
-# #     print("OpenPnL: ", open_pnl, " ClosedPnL: ", closed_pnl, " TotalPnL: ", (open_pnl + closed_pnl))
-# # =============================================================================
-#   else:
-#     # No trade since none of the conditions were met to buy or sell
-#     orders.append(0)
-# 
-#   positions.append(position)
-# 
-# =============================================================================
-# =============================================================================
-#   #3
-#   """
-#   Finally, let's also look at the position management and PnL update logic, very similar to previous trading strategies:
-#   """
-#   # This section updates Open/Unrealized & Closed/Realized positions
-#   open_pnl = 0
-#   if position > 0:
-#     if sell_sum_qty > 0:  # long position and some sell trades have been made against it, close that amount based on how much was sold against this long position
-#       open_pnl = abs(sell_sum_qty) * (sell_sum_price_qty / sell_sum_qty - buy_sum_price_qty / buy_sum_qty)
-#     # mark the remaining position to market i.e. pnl would be what it would be if we closed at current price
-#     open_pnl += abs(sell_sum_qty - position) * (close_price - buy_sum_price_qty / buy_sum_qty)
-#   elif position < 0:
-#     if buy_sum_qty > 0:  # short position and some buy trades have been made against it, close that amount based on how much was bought against this short position
-#       open_pnl = abs(buy_sum_qty) * (sell_sum_price_qty / sell_sum_qty - buy_sum_price_qty / buy_sum_qty)
-#     # mark the remaining position to market i.e. pnl would be what it would be if we closed at current price
-#     open_pnl += abs(buy_sum_qty - position) * (sell_sum_price_qty / sell_sum_qty - close_price)
-#   else:
-#     # flat, so update closed_pnl and reset tracking variables for positions & pnls
-#     closed_pnl += (sell_sum_price_qty - buy_sum_price_qty)
-#     buy_sum_price_qty = 0
-#     buy_sum_qty = 0
-#     sell_sum_price_qty = 0
-#     sell_sum_qty = 0
-#     last_buy_price = 0
-#     last_sell_price = 0
-# 
-#   pnls.append(closed_pnl + open_pnl)
-# =============================================================================
+
+
+def output_delta():
+    output_value = final_delta_projected
+    return output_value
+
+
+
 
 #output variable
 # =============================================================================

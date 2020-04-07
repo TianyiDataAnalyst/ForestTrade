@@ -34,7 +34,7 @@ account_id = account.oanda_pratice_account_id
 
 
 def candles(instrument):
-    params = {"count": 1500,"granularity": list(CandlestickGranularity)[9]} #granularity is in 'M15'[9]; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    params = {"count": 1500,"granularity": list(CandlestickGranularity)[5]} #granularity is in 'M15'[9]; M2 is 【5】it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -418,7 +418,6 @@ As we suspected, the currency pairs that are most strongly correlated to CAD/USD
 JPY/USD is the least correlated to CAD/USD price deviations.
 """
 
-
 #
 print ('plot 3')
 """
@@ -541,9 +540,14 @@ delta_projected_actual_data['Position'].value_counts()
 # delta_projected_actual_data = delta_projected_actual_data.dropna().apply(pd.Series)
 # #delta_projected_actual_data['Datetime']= delta_projected_actual_data.index
 # delta_projected_actual_data = delta_projected_actual_data.drop(columns=['StatArbTradingSignal'])
-# #delta_projected_actual_data.to_csv (r'C:\Users\gutia\Desktop\2000 shares  per trade 5 dollar profit export_dataframe.csv', index = True, header=True)
+# #delta_projected_actual_data.to_csv (r'C:\Users\gutia\Desktop\15m 2000 shares  per trade 5 dollar profit export_dataframe.csv', index = True, header=True)
+##delta_projected_actual_data.to_csv (r'C:\Users\gutia\Desktop\2m 2000 shares  per trade 1 dollar profit export_dataframe.csv', index = True, header=True)
 # #200shares 1dollar profit trade_export_dataframe
-# delta_projected_actual_data.to_csv (r'C:\Users\gutia\Desktop\200shares 1dollar profit trade_export_dataframe.csv', index = True, header=True)
+# delta_projected_actual_data.to_csv (r'C:\Users\gutia\Desktop\2m_1000shares_1dollarProfit_lowRequirement trade_export_dataframe.csv', index = True, header=True)
 # """
 # 
 # =============================================================================
+delta_projected_actual_data.describe()
+
+
+#mergedDf = pd.merge(correlation_data, delta_projected_actual_data, left_index=True, right_index=True)

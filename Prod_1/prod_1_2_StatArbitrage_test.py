@@ -17,7 +17,8 @@ from ForestTrade.config import oanda_login as account
 from ForestTrade.config import token
 from ForestTrade.config import var_prod_1
 from ForestTrade.file_directory import file_name
-from ForestTrade.Prod_1.prod_1_1_2_StatArbitrage_strategy import final_delta_projected
+from ForestTrade.Prod_1.prod_1_1_2_StatArbitrage_strategy import output_delta
+import os
 
 #
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
@@ -34,6 +35,9 @@ pos_size = var_prod_1.NUM_SHARES_PER_TRADE
 StatArb_VALUE_FOR_BUY_ENTRY = var_prod_1.VALUE_FOR_BUY_ENTRY
 
 StatArb_VALUE_FOR_SELL_ENTRY = var_prod_1.VALUE_FOR_SELL_ENTRY
+
+os.system("prod_1_1_2_StatArbitrage_strategy.py")
+final_delta_projected = output_delta()
 
 def candles(instrument):
     params = {"count": 100,"granularity": list(CandlestickGranularity)[9]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
@@ -119,7 +123,7 @@ def trade_signal():
     if float(final_delta_projected) < StatArb_VALUE_FOR_SELL_ENTRY:
         signal = "Sell"
     return signal
-  
+
 def main():
     currency =TRADING_INSTRUMENT
     print("StatAtr_test script analyzing ",currency)
