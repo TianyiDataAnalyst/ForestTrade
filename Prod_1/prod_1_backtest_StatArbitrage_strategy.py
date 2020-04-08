@@ -17,6 +17,7 @@ import numpy as np
 from ForestTrade.config import oanda_login as account
 from ForestTrade.config import token
 from ForestTrade.config import var_prod_1
+import oandapyV20.endpoints.forexlabs as labs
 
 
 #
@@ -34,7 +35,8 @@ account_id = account.oanda_pratice_account_id
 
 
 def candles(instrument):
-    params = {"count": 1500,"granularity": list(CandlestickGranularity)[5]} #granularity is in 'M15'[9]; M2 is 【5】it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    n=var_prod_1.time_interval
+    params = {"count": 1500,"granularity": list(CandlestickGranularity)[n]} #granularity is in 'M15'[9]; M2 is 【5】it can be in seconds S5 - S30, minutes M1 - M30, hours H1[11] - H12, days D[18], weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -69,6 +71,17 @@ def ATR(DF,n):
     #df['ATR'] = df['TR'].ewm(span=n,adjust=False,min_periods=n).mean()
     df2 = df.drop(['H-L','H-PC','L-PC'],axis=1)
     return round(3*df2['ATR'][-1],5)
+
+def spread_check(): #average spread
+    data = {
+            "instrument": var_prod_1.TRADING_INSTRUMENT,
+            "period": 1
+            }
+    r = labs.Spreads(params=data)
+    client.request(r)
+    return r.response['avg'][-1][1]
+
+cost = (1/10000)*spread_check()
 
 # =============================================================================
 # def reverse_base_curr(instrument, data):
@@ -165,7 +178,7 @@ StatArb_VALUE_FOR_SELL_ENTRY = var_prod_1.VALUE_FOR_SELL_ENTRY  # StatArb tradin
 MIN_PRICE_MOVE_FROM_LAST_TRADE = 0  # Minimum price change since last trade before considering trading again, this is to prevent over-trading at/around same prices
 NUM_SHARES_PER_TRADE = var_prod_1.NUM_SHARES_PER_TRADE  # Number of currency to buy/sell on every trade
 MIN_PROFIT_TO_CLOSE = var_prod_1.pnl_value  # Minimum Open/Unrealized profit at which to close positions and lock profits
-
+sum_cost = 0
 
 # =============================================================================
 # Quantifying and computing StatArb trading signals
@@ -296,6 +309,7 @@ for i in range(0, num_days):
       position -= NUM_SHARES_PER_TRADE  # reduce position by the size of this trade
       sell_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update vwap sell-price
       sell_sum_qty += NUM_SHARES_PER_TRADE
+      sum_cost += (close_price * NUM_SHARES_PER_TRADE*cost)/2
       #simulate trade
       #print trade result 
 # =============================================================================
@@ -317,6 +331,7 @@ for i in range(0, num_days):
     position += NUM_SHARES_PER_TRADE  # increase position by the size of this trade
     buy_sum_price_qty += (close_price * NUM_SHARES_PER_TRADE)  # update the vwap buy-price
     buy_sum_qty += NUM_SHARES_PER_TRADE
+    sum_cost += (close_price * NUM_SHARES_PER_TRADE*cost)/2
     #simulate trade
     #print trade result    
     print("Buy ", NUM_SHARES_PER_TRADE, " @ ", close_price, "Position: ", position)
@@ -530,11 +545,21 @@ different market conditions because of its use of multiple currency pairs as lea
 And that's it, now you have a working example of a profitable statistical arbitrage strategy and should be able to improve and extend it to other trading instruments!
 """
 #Number of times trade
-delta_projected_actual_data['Trades'].value_counts()
+a=(delta_projected_actual_data.loc[delta_projected_actual_data.Trades==1, 'Trades'].sum())
+b=(delta_projected_actual_data.loc[delta_projected_actual_data.Trades==-1, 'Trades'].sum())
+print("trades count = ", (a-b)/2)
 
+print("cost sum = ", sum_cost)
+
+print("Profit = ", np.mean(delta_projected_actual_data['Pnl'])-sum_cost)
 #
-delta_projected_actual_data['Position'].value_counts()
-# =============================================================================
+print()
+print("position count: ", max(max(delta_projected_actual_data['Position']),  abs(min(delta_projected_actual_data['Position']))))
+
+print("account requirement: ", max(max(delta_projected_actual_data['Position']),  abs(min(delta_projected_actual_data['Position'])))*0.03)
+#
+
+#=============================================================================
 # 
 # """
 # delta_projected_actual_data = delta_projected_actual_data.dropna().apply(pd.Series)

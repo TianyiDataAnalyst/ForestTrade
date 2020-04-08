@@ -6,7 +6,8 @@ Created on Thu Mar 26 15:14:14 2020
 """
 import time
 import os
- 
+from ForestTrade.file_directory import file_name
+
 def main():
     os.system('python C:\\Users\\gutia\\Documents\\GitHub\\ForestTrade\\Prod_1\\prod_1_1_2_StatArbitrage_strategy.py')
 # run 12 hours and trigger the file in every 15 minutes

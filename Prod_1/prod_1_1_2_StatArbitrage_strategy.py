@@ -13,7 +13,7 @@ import pandas as pd
 #import matplotlib.pyplot as plt
 import statistics as stats
 import numpy as np
-#import time
+import time
 from ForestTrade.config import var_prod_1
 from ForestTrade.config import oanda_login as account
 from ForestTrade.config import token
@@ -271,31 +271,31 @@ for i in range(0, num_days):
   final_delta_projected_history.append(final_delta_projected)
 
 
-def output_delta():
-    output_value = final_delta_projected
-    return output_value
-
-
-
-
-#output variable
 # =============================================================================
 # def output_delta():
 #     output_value = final_delta_projected
-#     f = open("prod_1_4_final_delta_projected.txt","a+")
-#     f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) +'  value: '+str(output_value)+ '\n')
-#     f.close
+#     return output_value
 # 
 # 
-# # run 12 hours and trigger the file in every 15 minutes
-# starttime=time.time()
-# timeout = time.time() + (60*60*12)  # 60 seconds times 60 meaning the script will run for 1 hr
-# while time.time() <= timeout:
-#     try:
-#         print("Strategy_controler script passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
-#         output_delta()
-#         time.sleep(15*60 - ((time.time() - starttime) % 15.0*60)) # orignial 300=5 minute interval between each new execution
-#     except KeyboardInterrupt:
-#         print('\n\nKeyboard exception received. Exiting.')
-#         exit()
 # =============================================================================
+
+
+#output variable
+def output_delta():
+    output_value = final_delta_projected
+    f = open("prod_1_4_final_delta_projected.txt","a+")
+    f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) +'  value: '+str(output_value)+ '\n')
+    f.close
+
+
+# run 12 hours and trigger the file in every 15 minutes
+starttime=time.time()
+timeout = time.time() + (60*60*12)  # 60 seconds times 60 meaning the script will run for 1 hr
+while time.time() <= timeout:
+    try:
+        print("Strategy_controler script passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+        output_delta()
+        time.sleep(15*60 - ((time.time() - starttime) % 15.0*60)) # orignial 300=5 minute interval between each new execution
+    except KeyboardInterrupt:
+        print('\n\nKeyboard exception received. Exiting.')
+        exit()
