@@ -17,8 +17,17 @@ from ForestTrade.config import oanda_login as account
 from ForestTrade.config import token
 from ForestTrade.config import var_prod_1
 from ForestTrade.file_directory import file_name
-from ForestTrade.Prod_1.prod_1_1_2_StatArbitrage_strategy import output_delta
-import os
+#from ForestTrade.Prod_1.prod_1_1_2_StatArbitrage_strategy import output_delta
+import re
+
+def final_delta_projected():   
+    for line in open("C:\\Users\\gutia\\Anaconda3\\ForestTrade\\log\\prod_1_4_final_delta_projected.txt"):
+        pass
+    #print(line)    
+    regex=re.findall(r'(?<=value:).*?(?=\s)', line)
+    final_delta_projected = ' '.join(map(str, regex))
+    final_delta_projected = float(final_delta_projected)
+    return final_delta_projected
 
 #
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
@@ -27,7 +36,6 @@ CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.ke
 client = oandapyV20.API(str(token.token),environment="practice")
 account_id = account.oanda_pratice_account_id
 
-
 TRADING_INSTRUMENT = var_prod_1.TRADING_INSTRUMENT
          
 pos_size = var_prod_1.NUM_SHARES_PER_TRADE
@@ -35,9 +43,6 @@ pos_size = var_prod_1.NUM_SHARES_PER_TRADE
 StatArb_VALUE_FOR_BUY_ENTRY = var_prod_1.VALUE_FOR_BUY_ENTRY
 
 StatArb_VALUE_FOR_SELL_ENTRY = var_prod_1.VALUE_FOR_SELL_ENTRY
-
-os.system("prod_1_1_2_StatArbitrage_strategy.py")
-final_delta_projected = output_delta()
 
 def candles(instrument):
     params = {"count": 100,"granularity": list(CandlestickGranularity)[9]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
@@ -118,9 +123,9 @@ ATR(data_h3,120)
 def trade_signal():
     signal = ""
     #"function to generate signal"
-    if float(final_delta_projected) > StatArb_VALUE_FOR_BUY_ENTRY:
+    if final_delta_projected() > StatArb_VALUE_FOR_BUY_ENTRY:
         signal = "Buy"
-    if float(final_delta_projected) < StatArb_VALUE_FOR_SELL_ENTRY:
+    if final_delta_projected() < StatArb_VALUE_FOR_SELL_ENTRY:
         signal = "Sell"
     return signal
 
@@ -131,18 +136,18 @@ def main():
     signal = trade_signal()
     if signal == "Buy":
         market_order(currency,pos_size,str(ATR(data_h3,20)))
-        print("New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected)
+        print("New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
         f = open(file_name('log\\trade_log.txt'), "a+")
         f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + " New long position initiated for " + currency + '\n' )
         f.close()
     elif signal == "Sell":
         market_order(currency,-1*pos_size,str(ATR(data_h3,20)))
-        print("New short position initiated for ", currency, " final_delta_projected: ", final_delta_projected)
+        print("New short position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
         f = open(file_name('log\\trade_log.txt'), "a+")
         f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + " New short position initiated for " + currency + '\n' )
         f.close()
     else:
-        print(currency, "not meet the trade critiers", " final_delta_projected: ", final_delta_projected)
+        print(currency, "not meet the trade critiers", " final_delta_projected: ", final_delta_projected())
                 
 starttime=time.time()
 timeout = time.time() + (60*60*12)  # 60 seconds times 60 meaning the script will run for 1 hr

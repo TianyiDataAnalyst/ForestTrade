@@ -1,0 +1,197 @@
+passthrough at  2020-04-08 16:44:58
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 16:59:42
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 17:00:25
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 17:02:32
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 17:13:18
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 17:22:21
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 17:28:33
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 17:37:40
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 17:39:41
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 17:41:12
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 17:41:17
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 17:51:43
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 18:06:08
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 18:10:30
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 18:22:59
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 18:36:40
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 18:38:59
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 18:53:01
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 19:04:34
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 19:12:31
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 19:23:24
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 19:26:41
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 19:28:01
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 19:39:19
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 19:48:04
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 19:56:02
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 20:06:00
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 20:17:59
+StatAtr_test script analyzing  NZD_CAD
+New long position initiated for  NZD_CAD  final_delta_projected:  0.0011040563230779667
+passthrough at  2020-04-08 20:30:19
+StatAtr_test script analyzing  NZD_CAD
+Traceback (most recent call last):
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\urllib3\connectionpool.py", line 672, in urlopen
+    chunked=chunked,
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\urllib3\connectionpool.py", line 421, in _make_request
+    six.raise_from(e, None)
+
+  File "<string>", line 3, in raise_from
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\urllib3\connectionpool.py", line 416, in _make_request
+    httplib_response = conn.getresponse()
+
+  File "C:\Users\gutia\Anaconda3\lib\http\client.py", line 1344, in getresponse
+    response.begin()
+
+  File "C:\Users\gutia\Anaconda3\lib\http\client.py", line 306, in begin
+    version, status, reason = self._read_status()
+
+  File "C:\Users\gutia\Anaconda3\lib\http\client.py", line 267, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+
+  File "C:\Users\gutia\Anaconda3\lib\socket.py", line 589, in readinto
+    return self._sock.recv_into(b)
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\urllib3\contrib\pyopenssl.py", line 318, in recv_into
+    raise SocketError(str(e))
+
+OSError: (10060, 'WSAETIMEDOUT')
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\requests\adapters.py", line 449, in send
+    timeout=timeout
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\urllib3\connectionpool.py", line 720, in urlopen
+    method, url, error=e, _pool=self, _stacktrace=sys.exc_info()[2]
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\urllib3\util\retry.py", line 400, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\urllib3\packages\six.py", line 734, in reraise
+    raise value.with_traceback(tb)
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\urllib3\connectionpool.py", line 672, in urlopen
+    chunked=chunked,
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\urllib3\connectionpool.py", line 421, in _make_request
+    six.raise_from(e, None)
+
+  File "<string>", line 3, in raise_from
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\urllib3\connectionpool.py", line 416, in _make_request
+    httplib_response = conn.getresponse()
+
+  File "C:\Users\gutia\Anaconda3\lib\http\client.py", line 1344, in getresponse
+    response.begin()
+
+  File "C:\Users\gutia\Anaconda3\lib\http\client.py", line 306, in begin
+    version, status, reason = self._read_status()
+
+  File "C:\Users\gutia\Anaconda3\lib\http\client.py", line 267, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+
+  File "C:\Users\gutia\Anaconda3\lib\socket.py", line 589, in readinto
+    return self._sock.recv_into(b)
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\urllib3\contrib\pyopenssl.py", line 318, in recv_into
+    raise SocketError(str(e))
+
+ProtocolError: ('Connection aborted.', OSError("(10060, 'WSAETIMEDOUT')"))
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+
+  File "<ipython-input-1-101561662baf>", line 163, in <module>
+    main()
+
+  File "<ipython-input-1-101561662baf>", line 140, in main
+    data_h3 = candles_h3(currency)
+
+  File "<ipython-input-1-101561662baf>", line 77, in candles_h3
+    client.request(candles)
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\oandapyV20\oandapyV20.py", line 306, in request
+    request_args, headers=headers)
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\oandapyV20\oandapyV20.py", line 234, in __request
+    raise err
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\oandapyV20\oandapyV20.py", line 231, in __request
+    **request_args)
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\requests\sessions.py", line 543, in get
+    return self.request('GET', url, **kwargs)
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\requests\sessions.py", line 530, in request
+    resp = self.send(prep, **send_kwargs)
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\requests\sessions.py", line 643, in send
+    r = adapter.send(request, **kwargs)
+
+  File "C:\Users\gutia\Anaconda3\lib\site-packages\requests\adapters.py", line 498, in send
+    raise ConnectionError(err, request=request)
+
+ConnectionError: ('Connection aborted.', OSError("(10060, 'WSAETIMEDOUT')"))

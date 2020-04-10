@@ -15,7 +15,7 @@ def readFile(filename):
 
 
 fileDir = os.path.dirname(os.path.realpath('__file__'))
-print (fileDir)
+
 
 def file_name(filename):
     fileName = os.path.join(fileDir, 'Anaconda3\\ForestTrade\\',filename)

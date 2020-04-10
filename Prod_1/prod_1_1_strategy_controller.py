@@ -6,13 +6,13 @@ Created on Thu Mar 26 15:14:14 2020
 """
 import time
 import os
-from ForestTrade.file_directory import file_name
+#from ForestTrade.file_directory import file_name
 
 def main():
-    os.system('python C:\\Users\\gutia\\Documents\\GitHub\\ForestTrade\\Prod_1\\prod_1_1_2_StatArbitrage_strategy.py')
+    os.system('python C:\\Users\\gutia\\Anaconda3\\ForestTrade\\Prod_1\\prod_1_1_2_StatArbitrage_strategy.py')
 # run 12 hours and trigger the file in every 15 minutes
 starttime=time.time()
-timeout = time.time() + (60*60*12)  # 60 seconds times 60 meaning the script will run for 1 hr
+timeout = time.time() + (60*60*24*16)  # 60 seconds times 60 meaning the script will run for 1 hr
 while time.time() <= timeout:
     try:
         print("Strategy_controler script passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))

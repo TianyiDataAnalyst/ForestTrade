@@ -28,10 +28,11 @@ account_id = account.oanda_pratice_account_id
 #pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] #currency pairs to be included in the strategy
 #pairs = ['EUR_JPY','USD_JPY','AUD_JPY','AUD_USD','AUD_NZD','NZD_USD']
 
-pos_size = 2000 
+pos_size = var_prod_1.NUM_SHARES_PER_TRADE
 
 def candles(instrument):
-    params = {"count": 1500,"granularity": list(CandlestickGranularity)[5]} #granularity is in 'M15'[9]; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    n=var_prod_1.time_interval
+    params = {"count": 1500,"granularity": list(CandlestickGranularity)[n]} #granularity is in 'M15'[9]; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -271,31 +272,10 @@ for i in range(0, num_days):
   final_delta_projected_history.append(final_delta_projected)
 
 
-# =============================================================================
-# def output_delta():
-#     output_value = final_delta_projected
-#     return output_value
-# 
-# 
-# =============================================================================
-
-
-#output variable
-def output_delta():
-    output_value = final_delta_projected
-    f = open("prod_1_4_final_delta_projected.txt","a+")
+#output variable 
+output_value = final_delta_projected
+with open("C:\\Users\\gutia\\Anaconda3\\ForestTrade\\log\\prod_1_4_final_delta_projected.txt","a+") as f:
     f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) +'  value: '+str(output_value)+ '\n')
-    f.close
+    f.close()
 
-
-# run 12 hours and trigger the file in every 15 minutes
-starttime=time.time()
-timeout = time.time() + (60*60*12)  # 60 seconds times 60 meaning the script will run for 1 hr
-while time.time() <= timeout:
-    try:
-        print("Strategy_controler script passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
-        output_delta()
-        time.sleep(15*60 - ((time.time() - starttime) % 15.0*60)) # orignial 300=5 minute interval between each new execution
-    except KeyboardInterrupt:
-        print('\n\nKeyboard exception received. Exiting.')
-        exit()
+print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) +'  value: '+str(output_value))
