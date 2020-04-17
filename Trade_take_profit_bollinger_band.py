@@ -73,6 +73,17 @@ df = candles('USD_CAD')
 ATR(df,50)
 """
 
+def BollBnd(DF,n):
+    "function to calculate Bollinger Band"
+    df = DF.copy()
+    df["MA"] = df['c'].rolling(n).mean()
+    df["BB_up"] = df["MA"] + 2*df['c'].rolling(n).std(ddof=0) #ddof=0 is required since we want to take the standard deviation of the population and not sample
+    df["BB_dn"] = df["MA"] - 2*df['c'].rolling(n).std(ddof=0) #ddof=0 is required since we want to take the standard deviation of the population and not sample
+    df["BB_width"] = df["BB_up"] - df["BB_dn"]
+    df.dropna(inplace=True)
+    return df
+
+
 def sys_time():
     params = {"instruments": trade_instrument}
     account_id = account.oanda_pratice_account_id

@@ -21,6 +21,7 @@ from ForestTrade.config import token
 from ForestTrade.config import oanda_login as account
 from ForestTrade.config import var_prod_1
 from ForestTrade.file_directory import file_name
+from oandapyV20.contrib.requests import (MarketOrderRequest, TakeProfitDetails, ClientExtensions)
 
 # =============================================================================
 # pd.set_option('display.max_rows', 1000) 
@@ -45,7 +46,21 @@ NUM_SHARES_PER_TRADE = var_prod_1.NUM_SHARES_PER_TRADE
 
 #instrument = 'NZD_CAD'
 def candles(instrument):
-    params = {"count": 50,"granularity": list(CandlestickGranularity)[4]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    n = var_prod_1.time_interval
+    params = {"count": 50,"granularity": list(CandlestickGranularity)[n]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
+    client.request(candles)
+    ohlc_dict = candles.response["candles"]
+    ohlc = pd.DataFrame(ohlc_dict)
+    ohlc_df = ohlc.mid.dropna().apply(pd.Series)
+    ohlc_df["volume"] = ohlc["volume"]
+    ohlc_df.index = ohlc["time"]
+    ohlc_df = ohlc_df.apply(pd.to_numeric)
+    return ohlc_df
+
+def candles_h3(instrument):
+    n=var_prod_1.time_interval_sl
+    params = {"count": 200,"granularity": list(CandlestickGranularity)[n]} #granularity is in 'M5'; it can be in seconds S5 - S30, minutes M1 - M30[10], hours H1 - H12, 2M[5],4M[6] 5M[7],15M[9],H2[12]
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -147,7 +162,46 @@ def trade_close(trade_ID, curr_unit): #OANDA REST-V20 API Documentation,Page 67
                 }
         r = trades.TradeClose(accountID=account_id, tradeID=trade_ID, data=data)
         client.request(r)
-        
+#tradeID=1550
+def take_profit_price(tradeID):
+    df_open_trade= pd.DataFrame(client.request(trades.OpenTrades(accountID=account_id))['trades']) 
+    trade_instrument = var_prod_1.TRADING_INSTRUMENT
+    data_h3 = candles_h3(trade_instrument)
+    r = trades.OpenTrades(accountID=account_id)
+    df_open_trade['take_profit_price']=[]
+    open_trades = client.request(r)['trades']      
+    for i in range(len(open_trades)): #i=1
+        df_open_trade['take_profit_price'][i] = np.where(float(df_open_trade['currentUnits'][i]) >0, float(df_open_trade['price'][i]) + 2*ATR(data_h3,20), float(df_open_trade['price'][i]) - 2*ATR(data_h3,20))
+    return df_open_trade['take_profit_price'][trade_id]
+#
+
+def take_profit_order(accountID,tradeID):
+    accountID = account.oanda_pratice_account_id
+
+    data ={
+           "takeProfit": {
+                   "timeInForce": "GTC",
+                   if current_unit(trade_id) > 0:
+                       "price": str( price + 2*ATR(DF,20))
+                   else:
+                       "price": str( price - 2*ATR(DF,20))
+                       
+                   },
+           "stopLoss": {
+                   "timeInForce": "GTC",
+                   if current_unit(trade_id) > 0:
+                       "price": str( price - ATR(DF,20))
+                   else:
+                       "price": str( price - ATR(DF,20))
+                   }
+           }
+            
+    r = trades.TradeCRCDO(accountID=accountID,
+                          tradeID=tradeID,
+                          data=data)
+    client.request(r)
+    r.response
+    
 
 #trade_close('6411','2000')
 #trade_id ='6352'

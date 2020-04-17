@@ -16,10 +16,10 @@ import statistics as stats
 import numpy as np
 from ForestTrade.config import oanda_login as account
 from ForestTrade.config import token
-from ForestTrade.config import var_prod_1
+from ForestTrade.config import var_prod_backtest_1
 import oandapyV20.endpoints.forexlabs as labs
 
-TRADING_INSTRUMENT = var_prod_1.TRADING_INSTRUMENT
+TRADING_INSTRUMENT = var_prod_backtest_1.TRADING_INSTRUMENT
 #
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
 
@@ -28,6 +28,12 @@ CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.ke
 client = oandapyV20.API(str(token.token),environment="practice")
 account_id = account.oanda_pratice_account_id
 
+data = pd.read_csv('C:\\Users\\gutia\\Desktop\\NZD_CAD_1years.txt')
+data = pd.DataFrame(data)
+data.index = data["time"]
+data.head()
+data.drop(columns=["time"])
+
 #defining strategy parameters
 #pairs = ['AUD_USD','GBP_USD','USD_CAD','USD_CHF','EUR_USD','USD_JPY','NZD_USD'] #currency pairs to be included in the strategy
 #pairs = ['EUR_JPY','USD_JPY','AUD_JPY','AUD_USD','AUD_NZD','NZD_USD']
@@ -35,8 +41,8 @@ account_id = account.oanda_pratice_account_id
 
 #15*5000/60/24 = 52.08
 def candles(instrument):
-    n=var_prod_1.time_interval
-    params = {"count": 3000,"granularity": list(CandlestickGranularity)[n]} #granularity is in 'M15'[9]; M2 is 【5】it can be in seconds S5 - S30, minutes M1 - M30, hours H1[11] - H12, days D[18], weeks W or months M
+    n=var_prod_backtest_1.time_interval
+    params = {"count": 5000,"granularity": list(CandlestickGranularity)[n]} #granularity is in 'M15'[9]; M2 is 【5】it can be in seconds S5 - S30, minutes M1 - M30, hours H1[11] - H12, days D[18], weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -48,7 +54,7 @@ def candles(instrument):
     return ohlc_df
 #candles(TRADING_INSTRUMENT).index[1]
 def candles_h3(instrument):
-    n=var_prod_1.time_interval_sl
+    n=var_prod_backtest_1.time_interval_sl
     params = {"count": 200,"granularity": list(CandlestickGranularity)[n]} #granularity is in 'M5'; it can be in seconds S5 - S30, minutes M1 - M30[10], hours H1 - H12, 2M[5],4M[6] 5M[7],15M[9],H2[12]
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
@@ -74,7 +80,7 @@ def ATR(DF,n):
 
 def spread_check(): #average spread
     data = {
-            "instrument": var_prod_1.TRADING_INSTRUMENT,
+            "instrument": var_prod_backtest_1.TRADING_INSTRUMENT,
             "period": 1
             }
     r = labs.Spreads(params=data)
@@ -114,7 +120,7 @@ def convert_currency(instrument):
 #SYMBOLS = ['AUD_USD','CAD_USD','NZD_USD','SPX500_USD']
 #SYMBOLS = ['AUD_USD','GBP_USD','CAD_USD','CHF_USD','EUR_USD','JPY_USD','NZD_USD']
 def clean_format(instrument):
-    df = candles(instrument)
+    df = data
     #df.index = pd.to_datetime(df.index) # change datetime to date, NOTE if granularity is less than day please delete
     df = df.reset_index()
     df.columns= ['Date','Open','High','Low','Close','Volume']
@@ -173,11 +179,11 @@ open_pnl = 0  # Open/Unrealized PnL marked to market
 closed_pnl = 0  # Closed/Realized PnL so far
 
 # Constants that define strategy behavior/thresholds
-StatArb_VALUE_FOR_BUY_ENTRY = var_prod_1.VALUE_FOR_BUY_ENTRY  # StatArb trading signal value aboe which to enter buy-orders/long-position
-StatArb_VALUE_FOR_SELL_ENTRY = var_prod_1.VALUE_FOR_SELL_ENTRY  # StatArb trading signal value below which to enter sell-orders/short-position
+StatArb_VALUE_FOR_BUY_ENTRY = var_prod_backtest_1.VALUE_FOR_BUY_ENTRY  # StatArb trading signal value aboe which to enter buy-orders/long-position
+StatArb_VALUE_FOR_SELL_ENTRY = var_prod_backtest_1.VALUE_FOR_SELL_ENTRY  # StatArb trading signal value below which to enter sell-orders/short-position
 MIN_PRICE_MOVE_FROM_LAST_TRADE = 0  # Minimum price change since last trade before considering trading again, this is to prevent over-trading at/around same prices
-NUM_SHARES_PER_TRADE = var_prod_1.NUM_SHARES_PER_TRADE  # Number of currency to buy/sell on every trade
-MIN_PROFIT_TO_CLOSE = var_prod_1.pnl_value  # Minimum Open/Unrealized profit at which to close positions and lock profits
+NUM_SHARES_PER_TRADE = var_prod_backtest_1.NUM_SHARES_PER_TRADE  # Number of currency to buy/sell on every trade
+MIN_PROFIT_TO_CLOSE = var_prod_backtest_1.pnl_value  # Minimum Open/Unrealized profit at which to close positions and lock profits
 sum_cost = 0
 
 # =============================================================================
@@ -301,9 +307,9 @@ for i in range(0, num_days):
   data_h3 = candles_h3(TRADING_INSTRUMENT)
   if ((final_delta_projected < StatArb_VALUE_FOR_SELL_ENTRY and abs(close_price - last_sell_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE) # StatArb below sell entry threshold, we should buy
   or 
-  (position > 0 and (open_pnl > MIN_PROFIT_TO_CLOSE)) # long from -ve StatArb and StatArb has gone positive or position is profitable, sell to close position
-  or 
-  (position > 0 and (close_price < ATR(data_h3,20)))): #stop loss
+  (position > 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))  ): # long from -ve StatArb and StatArb has gone positive or position is profitable, sell to close position
+  #or 
+  #(position > 0 and (close_price < ATR(data_h3,20)))): #stop loss
       orders.append(-1)  # mark the sell trade
       last_sell_price = close_price
       position -= NUM_SHARES_PER_TRADE  # reduce position by the size of this trade
@@ -312,10 +318,8 @@ for i in range(0, num_days):
       sum_cost += (close_price * NUM_SHARES_PER_TRADE*cost)/2
       #simulate trade
       #print trade result 
-# =============================================================================
-#     print("Sell ", NUM_SHARES_PER_TRADE, " @ ", close_price, "Position: ", position)
-#     print("OpenPnL: ", open_pnl, " ClosedPnL: ", closed_pnl, " TotalPnL: ", (open_pnl + closed_pnl))
-# =============================================================================
+      print("Sell ", NUM_SHARES_PER_TRADE, " @ ", close_price, "Position: ", position)
+      print("OpenPnL: ", open_pnl, " ClosedPnL: ", closed_pnl, " TotalPnL: ", (open_pnl + closed_pnl))
 
   # 2
   # We will perform a buy trade at close_prices if the following conditions are met:
@@ -323,9 +327,9 @@ for i in range(0, num_days):
   # 2. We are short( -ve position ) and current position is profitable enough to lock profit.
   elif ((final_delta_projected > StatArb_VALUE_FOR_BUY_ENTRY and abs(close_price - last_buy_price) > MIN_PRICE_MOVE_FROM_LAST_TRADE)  # StatArb below buy entry threshold, we should buy
         or
-        (position < 0 and (open_pnl > MIN_PROFIT_TO_CLOSE))  #short from +ve StatArb and StatArb has gone negative or position is profitable, buy to close position
-        or 
-        (position < 0 and (close_price > ATR(data_h3,20)))):  #stop loss
+        (position < 0 and (open_pnl > MIN_PROFIT_TO_CLOSE)) ): #short from +ve StatArb and StatArb has gone negative or position is profitable, buy to close position
+        #or 
+        #(position < 0 and (close_price > ATR(data_h3,20)))):  #stop loss
     orders.append(+1)  # mark the buy trade
     last_buy_price = close_price
     position += NUM_SHARES_PER_TRADE  # increase position by the size of this trade

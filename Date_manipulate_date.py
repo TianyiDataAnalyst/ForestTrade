@@ -157,3 +157,14 @@ def date_diff(start_date, end_date):
     return(busi_days_diff)
 (date_diff('2020-03-13', '2020-03-15'))>=1
 
+
+
+#Generic
+import oandapyV20.contrib.generic as generic
+s = "M5"
+generic.granularity_to_time(s)
+datetime.datetime(2017, 6, 15, 4, 0)
+d = generic.secs2time(1497499200)
+d.strftime("%Y%m%d-%H:%M:%S")
+
+
