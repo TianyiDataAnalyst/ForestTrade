@@ -17,4 +17,4 @@ TRADING_INSTRUMENT = 'NZD_CAD'
 pnl_value = 34
 time_interval= 9
 time_interval_sl = 12
-
+risk_distance = 0.000513

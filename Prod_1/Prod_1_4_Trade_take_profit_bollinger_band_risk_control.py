@@ -206,20 +206,21 @@ def main():
     open_trades = client.request(r)['trades']
     trade_ids = []
     trade_id = []
+    risk_distance = var_prod_1.risk_distance
     if len(open_trades)==0:
         print("no open trade: " + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))   
     for i in range(len(open_trades)):
         trade_ids.append(open_trades[i]['id'])
     trade_id = [i for i in trade_ids if i not in trade_ids]
     for trade_id in trade_ids:       
-        if  current_unit(trade_id) > 0 and entry_price(trade_id) > BollBnd(candles_h4(TRADING_INSTRUMENT),20)['BB_up'][-1]: # and time_threshold(trade_id) > 899:
+        if  current_unit(trade_id) > 0 and BollBnd(candles_h4(TRADING_INSTRUMENT),20)['BB_width'][-1] >float(risk_distance) and candles_h4(TRADING_INSTRUMENT)['c'][-1] > BollBnd(candles_h4(TRADING_INSTRUMENT),20)['BB_up'][-1]: 
             print("Close long trade:")
             print("ID:", trade_id)
             position_close_long()
             f = open(file_name('log\\prod_1_pnl.txt'),"a+")
             f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) +", trade_id:" +str(trade_id))
             f.close
-        if current_unit(trade_id) < 0 and entry_price(trade_id) < BollBnd(candles_h4(TRADING_INSTRUMENT),20)['BB_dn'][-1]:
+        if current_unit(trade_id) < 0 and BollBnd(candles_h4(TRADING_INSTRUMENT),20)['BB_width'][-1] >float(risk_distance) and candles_h4(TRADING_INSTRUMENT)['c'][-1] < BollBnd(candles_h4(TRADING_INSTRUMENT),20)['BB_dn'][-1]:
             print("Close short trade:")
             print("ID:", trade_id)
             position_close_short()
@@ -232,7 +233,7 @@ starttime=time.time()
 timeout = time.time() + (60*60*24*15)  # 60 seconds times 60 meaning the script will run for 1 hr
 while time.time() <= timeout:
     try:
-        print("Taking Profit script passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+        print("Risk Control script passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
         main()
         time.sleep(60*15*1 - ((time.time() - starttime) % 60.0*15)) # orignial 300=5 minute interval between each new execution
     except KeyboardInterrupt:
