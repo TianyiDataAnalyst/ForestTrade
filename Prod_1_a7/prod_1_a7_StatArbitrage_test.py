@@ -21,7 +21,7 @@ from ForestTrade.file_directory import file_name
 import re
 
 def final_delta_projected():   
-    for line in open("C:\\Users\\gutia\\Anaconda3\\ForestTrade\\log\\prod_1_4_final_delta_projected.txt"):
+    for line in open("C:\\Users\\gutia\\Anaconda3\\ForestTrade\\log\\prod_1_a7_final_delta_projected.txt"):
         pass
     #print(line)    
     regex=re.findall(r'(?<=value:).*?(?=\s)', line)
@@ -34,7 +34,7 @@ CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.ke
 
 #initiating API connection and defining trade parameters
 client = oandapyV20.API(str(token.token),environment="practice")
-account_id = account.oanda_pratice_account_id
+account_id = account.oanda_pratice_account_id_a7
 
 TRADING_INSTRUMENT = var_prod_1.TRADING_INSTRUMENT
          

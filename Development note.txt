@@ -1,0 +1,49 @@
+April 22 2020 
+Manually closed short positions caused a big lose, due to implement new risk control module.
+
+Also, there are about 10 counter risk positions which are cancelled. I have sent email to the broker asking the
+reason.
+
+The risk control module is updated to execute in a more sensitive scale.
+
+April 23 2020
+A bunch of long positions are closed out trigged by stop lose. Because yesterday the counter positions are
+closed or failed to open, no position could cover the unfavourable move, the balance drop to 1961.33.
+
+Today, I will look into a Machine Learning solution that could enhance the risk control module. Looking
+for the broker could answer the position cancel reason.
+
+April 24 2020
+
+Yesterday, I updated the risk control module. Fixed the scanning each trade loop logic 
+which is removed.
+
+Today, I will keep working on the Machine Learning solution on risk control.
+
+April 26
+
+RSI online
+
+April 27
+Wrap up from GMMA program
+Research on DMI-ADX. 
+MACD add to the RSI logic.
+
+April 28
+
+MACD and RSI observation. 
+MACD crossover is slow on indicting to buy or sell. To be studied more.
+
+April 29
+Swing back to Arbitrage trading strategy. Develop profit pruning report. Add system One to profit taking process. Protentially, it can be implemented to system Two.
+By setting number_openTrade >40 and taking profit threshold, close out unbalanced positions.
+
+Lessons Learned:
+Risk management --  account balance is not the source of risk mitigation, margin hedging is.   Buy and sell in a same range will even the risk of open positions.
+So stop_loss set up to 900000 distance, in other words, disabled stop loss. 
+
+Aprill 30
+
+
+
+ 

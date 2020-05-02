@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr 17 11:54:58 2020
+Created on Tue Apr 21 19:05:02 2020
 
 @author: gutia
 """
@@ -8,6 +8,8 @@ import oandapyV20
 import oandapyV20.endpoints.instruments as instruments
 import oandapyV20.definitions.instruments as definstruments
 import pandas as pd
+import numpy as np
+import statsmodels.api as sm
 #import oandapyV20.endpoints.orders as orders
 from ForestTrade.config import oanda_login as account
 from ForestTrade.config import token
@@ -42,15 +44,24 @@ def candles(instrument):
     ohlc_df = ohlc_df.apply(pd.to_numeric)
     return ohlc_df
 
-def BollBnd(DF,n):
-    "function to calculate Bollinger Band"
-    df = DF.copy()
-    df["MA"] = df['c'].rolling(n).mean()
-    df["BB_up"] = df["MA"] + 2*df['c'].rolling(n).std(ddof=0) #ddof=0 is required since we want to take the standard deviation of the population and not sample
-    df["BB_dn"] = df["MA"] - 2*df['c'].rolling(n).std(ddof=0) #ddof=0 is required since we want to take the standard deviation of the population and not sample
-    df["BB_width"] = df["BB_up"] - df["BB_dn"]
-    df.dropna(inplace=True)
-    return df
 
-# Visualizing Bollinger Band of the stocks for last 100 data points
-BollBnd(candles(TRADING_INSTRUMENT),20).iloc[-100:,[3,-4,-3,-2]].plot(title="Bollinger Band")
+def slope(ser,n):
+    #"function to calculate the slope of n consecutive points on a plot"
+    slopes = [i*0 for i in range(n-1)]
+    for i in range(n,len(ser)+1):
+        y = ser[i-n:i]
+        x = np.array(range(n))
+        y_scaled = (y - y.min())/(y.max() - y.min())
+        x_scaled = (x - x.min())/(x.max() - x.min())
+        x_scaled = sm.add_constant(x_scaled)
+        model = sm.OLS(y_scaled,x_scaled)
+        results = model.fit()
+        slopes.append(results.params[-1])
+    slope_angle = (np.rad2deg(np.arctan(np.array(slopes))))
+    return np.array(slope_angle)
+
+
+data = candles(TRADING_INSTRUMENT)
+data["slope"] = slope(data["c"],5)
+data["slope"].tail(1)
+data.iloc[:,[3,5]].plot(subplots=True, layout = (2,1))

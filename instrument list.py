@@ -1,0 +1,139 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Apr 28 18:51:02 2020
+
+@author: gutia
+"""
+
+
+AUD/CAD	
+AUD/CHF
+AUD/HKD
+AUD/JPY
+AUD/NZD
+AUD/SGD
+AUD/USD
+CAD/CHF
+CAD/HKD
+CAD/JPY
+CAD/SGD
+CHF/HKD
+CHF/JPY
+CHF/ZAR
+EUR/AUD
+EUR/CAD
+EUR/CHF
+EUR/CZK
+EUR/DKK
+EUR/GBP
+EUR/HKD
+EUR/HUF
+EUR/JPY
+EUR/NOK
+EUR/NZD
+EUR/PLN
+EUR/SEK
+EUR/SGD
+EUR/TRY
+EUR/USD
+EUR/ZAR
+GBP/AUD
+GBP/CAD
+GBP/CHF
+GBP/HKD
+GBP/JPY
+GBP/NZD
+GBP/PLN
+GBP/SGD
+GBP/USD
+GBP/ZAR
+HKD/JPY
+NZD/CAD
+NZD/CHF
+NZD/HKD
+NZD/JPY
+NZD/SGD
+NZD/USD
+SGD/CHF
+SGD/HKD
+SGD/JPY
+TRY/JPY
+USD/CAD
+USD/CHF
+USD/CNH
+USD/CZK
+USD/DKK
+USD/HKD
+USD/HUF
+USD/INR
+USD/JPY
+USD/MXN
+USD/NOK
+USD/PLN
+USD/SAR
+USD/SEK
+USD/SGD
+USD/THB
+USD/TRY
+USD/ZAR
+ZAR/JPY
+
+Australia 200
+China A50
+Europe 50
+France 40
+Germany 30
+Hong Kong 33
+India 50
+Japan 225
+Netherlands 25
+Singapore
+Taiwan Index
+UK 100
+US Nas 100
+US Russ 2000	
+US SPX 500
+US Wall St 30
+Commodities
+
+Brent Crude Oil
+Copper
+Corn
+Natural Gas
+Soybeans
+Sugar
+West Texas Oil
+Wheat
+Bonds
+
+Bund
+UK 10Y Gilt
+US 10Y T-Note
+US 2Y T-Note	
+US 5Y T-Note	
+US T-Bond
+Metals
+
+Gold
+Gold/AUD
+Gold/CAD
+Gold/CHF
+Gold/EUR
+Gold/GBP
+Gold/HKD
+Gold/JPY
+Gold/NZD
+Gold/SGD
+Gold/Silver
+Palladium
+Platinum
+Silver
+Silver/AUD
+Silver/CAD
+Silver/CHF
+Silver/EUR
+Silver/GBP
+Silver/HKD
+Silver/JPY
+Silver/NZD
+Silver/SGD

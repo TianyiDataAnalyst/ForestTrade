@@ -19,9 +19,10 @@ from ForestTrade.config import var_prod_1
 from ForestTrade.file_directory import file_name
 #from ForestTrade.Prod_1.prod_1_1_2_StatArbitrage_strategy import output_delta
 import re
+import oandapyV20.endpoints.trades as trades
 
 def final_delta_projected():   
-    for line in open("C:\\Users\\gutia\\Anaconda3\\ForestTrade\\log\\prod_1_4_final_delta_projected.txt"):
+    for line in open("C:\\Users\\gutia\\Anaconda3\\ForestTrade\\log\\prod_1_a2_final_delta_projected.txt"):
         pass
     #print(line)    
     regex=re.findall(r'(?<=value:).*?(?=\s)', line)
@@ -34,7 +35,7 @@ CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.ke
 
 #initiating API connection and defining trade parameters
 client = oandapyV20.API(str(token.token),environment="practice")
-account_id = account.oanda_pratice_account_id
+account_id = account.oanda_pratice_account_id_a2
 
 TRADING_INSTRUMENT = var_prod_1.TRADING_INSTRUMENT
          
@@ -129,27 +130,44 @@ def trade_signal():
         signal = "Sell"
     return signal
 
+def postion_balanace(l_s):
+    df_open_trade= pd.DataFrame(client.request(trades.OpenTrades(accountID=account_id))['trades'])    
+    df_open_trade['currentUnits'] = df_open_trade['currentUnits'].apply(pd.to_numeric)
+    count_short_position = df_open_trade['id'][df_open_trade['currentUnits'] > 0.0].count()
+    count_long_position = df_open_trade['id'][df_open_trade['currentUnits'] < 0.0].count()
+    if l_s =="short":
+        if count_short_position <20:
+            balance_signal = "short_open"
+        elif count_short_position ==20:
+            balance_signal = "short_close"
+    if l_s =="long":            
+        if count_long_position <19:
+            balance_signal = "long_open"
+        elif count_long_position ==19:
+            balance_signal = "long_close"
+    return balance_signal
+#postion_balanace(l_s="short")
 
 def main():
     currency =TRADING_INSTRUMENT
     print("StatAtr_test script analyzing ",currency)
     signal = trade_signal()
-    if signal == "Buy":
-        market_order(currency,pos_size,str(900000))
-        print("New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
+    if signal == "Buy" and postion_balanace(l_s="long") == 'long_open':
+        market_order(currency,pos_size,str(300000))
+        print(account_id, "New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
 
-    elif signal == "Sell":
-        market_order(currency,-1*pos_size,str(900000))
-        print("New short position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
+    elif signal == "Sell" and postion_balanace(l_s="short") == 'short_open':
+        market_order(currency,-1*pos_size,str(300000))
+        print(account_id, "New short position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
 
     else:
-        print(currency, "not meet the trade critiers", " final_delta_projected: ", final_delta_projected())
+        print(account_id, "not meet the trade critiers", " final_delta_projected: ", final_delta_projected())
                 
 starttime=time.time()
 timeout = time.time() + (60*60*24*170)  # 60 seconds times 60 meaning the script will run for 1 hr
 while time.time() <= timeout:
     try:
-        print("passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+        print(account_id, "passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
         main()
         time.sleep(900 - ((time.time() - starttime) % 900.0)) # orignial 300=5 minute interval between each new execution
     except KeyboardInterrupt:

@@ -34,7 +34,7 @@ CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.ke
 
 #initiating API connection and defining trade parameters
 client = oandapyV20.API(token.token,environment="practice")
-account_id = account.oanda_pratice_account_id
+account_id = account.oanda_pratice_account_id_a2
 
 #Globle variable 
 TRADING_INSTRUMENT = var_prod_1.TRADING_INSTRUMENT
@@ -204,21 +204,33 @@ def position_close_short():
 #trade_close('6411','2000')
 #trade_id ='2074'
 def main():
+    trade_ids = []
+    trade_id = []
     r = trades.OpenTrades(accountID=account_id)
     open_trades = client.request(r)['trades']
-    risk_distance = var_prod_1.risk_distance
     if len(open_trades)==0:
         print("no open trade: " + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))   
     if len(open_trades)>0:
-        print("open trade: ")
-        if  BollBnd(candles_h1(TRADING_INSTRUMENT),20)['BB_width'][-1] >float(risk_distance) and candles_h1(TRADING_INSTRUMENT)['c'][-1] > BollBnd(candles_h1(TRADING_INSTRUMENT),20)['BB_up'][-1]: 
-            print("Close long trade:")
-            position_close_long()
-        if BollBnd(candles_h1(TRADING_INSTRUMENT),20)['BB_width'][-1] >float(risk_distance) and candles_h1(TRADING_INSTRUMENT)['c'][-1] < BollBnd(candles_h1(TRADING_INSTRUMENT),20)['BB_dn'][-1]:
-            print("Close short trade:")
-
-            
-            
+        print(account_id, " contains open trade: ")
+        unit = NUM_SHARES_PER_TRADE
+        currency = TRADING_INSTRUMENT
+        for i in range(len(open_trades)):
+            trade_ids.append(open_trades[i]['id'])
+            trade_id = [i for i in trade_ids if i not in trade_ids]
+            for trade_id in trade_ids:       
+                pnl = float(unrealizedPL_trade(trade_id))
+                pnl_value = var_prod_1.pnl_value
+                currentUnits = float(current_unit(trade_id))
+                risk_distance = var_prod_1.risk_distance
+                if pnl > pnl_value and BollBnd(candles_h1(TRADING_INSTRUMENT),20)['BB_width'][-1] > float(risk_distance) and candles(TRADING_INSTRUMENT)['c'][-1] > BollBnd(candles_h1(TRADING_INSTRUMENT),20)['BB_up'][-1] and currentUnits>0: 
+                    print("Close Long position:")
+                    print("ID:", trade_id, "pnl_value:", pnl, "current price",candles(TRADING_INSTRUMENT)['c'][-1], "BollBnd up value", BollBnd(candles_h1(TRADING_INSTRUMENT),20)['BB_up'][-1])   
+                    trade_close(trade_id, unit)
+                if pnl > pnl_value and BollBnd(candles_h1(TRADING_INSTRUMENT),20)['BB_width'][-1] > float(risk_distance) and candles(TRADING_INSTRUMENT)['c'][-1] < BollBnd(candles_h1(TRADING_INSTRUMENT),20)['BB_dn'][-1] and currentUnits<0: 
+                    print("Close Short position:")
+                    print("ID:", trade_id, "pnl_value:", pnl, "current price",candles(TRADING_INSTRUMENT)['c'][-1], "BollBnd down value", BollBnd(candles_h1(TRADING_INSTRUMENT),20)['BB_dn'][-1])   
+                    trade_close(trade_id, unit)
+                        
 starttime=time.time()
 timeout = time.time() + (60*60*24*100)  # 60 seconds times 60 meaning the script will run for 1 hr
 while time.time() <= timeout:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr 17 11:54:58 2020
+Created on Fri Apr 24 18:17:47 2020
 
 @author: gutia
 """
@@ -8,11 +8,13 @@ import oandapyV20
 import oandapyV20.endpoints.instruments as instruments
 import oandapyV20.definitions.instruments as definstruments
 import pandas as pd
+import numpy as np
 #import oandapyV20.endpoints.orders as orders
 from ForestTrade.config import oanda_login as account
 from ForestTrade.config import token
 from ForestTrade.config import var_prod_backtest_1
-
+import pandas_datareader.data as web
+import yfinance as yf
 
 TRADING_INSTRUMENT = var_prod_backtest_1.TRADING_INSTRUMENT
 #
@@ -42,15 +44,23 @@ def candles(instrument):
     ohlc_df = ohlc_df.apply(pd.to_numeric)
     return ohlc_df
 
-def BollBnd(DF,n):
-    "function to calculate Bollinger Band"
-    df = DF.copy()
-    df["MA"] = df['c'].rolling(n).mean()
-    df["BB_up"] = df["MA"] + 2*df['c'].rolling(n).std(ddof=0) #ddof=0 is required since we want to take the standard deviation of the population and not sample
-    df["BB_dn"] = df["MA"] - 2*df['c'].rolling(n).std(ddof=0) #ddof=0 is required since we want to take the standard deviation of the population and not sample
-    df["BB_width"] = df["BB_up"] - df["BB_dn"]
-    df.dropna(inplace=True)
-    return df
 
-# Visualizing Bollinger Band of the stocks for last 100 data points
-BollBnd(candles(TRADING_INSTRUMENT),20).iloc[-100:,[3,-4,-3,-2]].plot(title="Bollinger Band")
+
+data = candles(TRADING_INSTRUMENT)
+
+data.iloc[:,[3,5]].plot(subplots=True, layout = (2,1))
+
+#https://blog.quantinsti.com/volatility-and-measures-of-risk-adjusted-return-based-on-volatility/
+
+# Pull NIFTY data from Yahoo finance 
+NIFTY = candles(TRADING_INSTRUMENT)
+shape(NIFTY)
+# Compute the logarithmic returns using the Closing price 
+NIFTY['Log_Ret'] = np.log(NIFTY['c'] / NIFTY['c'].shift(1))
+
+# Compute Volatility using the pandas rolling standard deviation function
+NIFTY['Volatility'] = NIFTY['Log_Ret'].rolling(window=252).std() * np.sqrt(252)
+print(NIFTY.tail(15))
+
+# Plot the NIFTY Price series and the Volatility
+NIFTY[['c', 'Volatility']].plot(subplots=True, color='blue',figsize=(8, 6))

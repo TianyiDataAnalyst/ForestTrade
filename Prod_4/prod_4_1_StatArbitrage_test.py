@@ -15,13 +15,13 @@ import oandapyV20.endpoints.orders as orders
 import time
 from ForestTrade.config import oanda_login as account
 from ForestTrade.config import token
-from ForestTrade.config import var_prod_1
+from ForestTrade.config import var_prod_4
 from ForestTrade.file_directory import file_name
 #from ForestTrade.Prod_1.prod_1_1_2_StatArbitrage_strategy import output_delta
 import re
 
 def final_delta_projected():   
-    for line in open("C:\\Users\\gutia\\Anaconda3\\ForestTrade\\log\\prod_1_4_final_delta_projected.txt"):
+    for line in open("C:\\Users\\gutia\\Anaconda3\\ForestTrade\\log\\prod_4_4_final_delta_projected.txt"):
         pass
     #print(line)    
     regex=re.findall(r'(?<=value:).*?(?=\s)', line)
@@ -34,18 +34,19 @@ CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.ke
 
 #initiating API connection and defining trade parameters
 client = oandapyV20.API(str(token.token),environment="practice")
-account_id = account.oanda_pratice_account_id
+account_id = account.oanda_pratice_account_id_4
 
-TRADING_INSTRUMENT = var_prod_1.TRADING_INSTRUMENT
+TRADING_INSTRUMENT = var_prod_4.TRADING_INSTRUMENT
          
-pos_size = var_prod_1.NUM_SHARES_PER_TRADE
+pos_size = var_prod_4.NUM_SHARES_PER_TRADE
 
-StatArb_VALUE_FOR_BUY_ENTRY = var_prod_1.VALUE_FOR_BUY_ENTRY
+StatArb_VALUE_FOR_BUY_ENTRY = var_prod_4.VALUE_FOR_BUY_ENTRY
 
-StatArb_VALUE_FOR_SELL_ENTRY = var_prod_1.VALUE_FOR_SELL_ENTRY
+StatArb_VALUE_FOR_SELL_ENTRY = var_prod_4.VALUE_FOR_SELL_ENTRY
 
 def candles(instrument):
-    params = {"count": 100,"granularity": list(CandlestickGranularity)[9]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
+    n=var_prod_4.time_interval
+    params = {"count": 100,"granularity": list(CandlestickGranularity)[n]} #granularity is in 'M15'; it can be in seconds S5 - S30, minutes M1 - M30, hours H1 - H12, days D[18], weeks W or months M
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -71,7 +72,7 @@ def clean_format(instrument):
 
 
 def candles_h3(instrument):
-    params = {"count": 20,"granularity": list(CandlestickGranularity)[13]} #granularity is in 'M5'; it can be in seconds S5 - S30, minutes M1 - M30[10], hours H1 - H12, 2M[5],4M[6] 5M[7],15M[9],H2[12]
+    params = {"count": 50,"granularity": list(CandlestickGranularity)[13]} #granularity is in 'M5'; it can be in seconds S5 - S30, minutes M1 - M30[10], hours H1 - H12, 2M[5],4M[6] 5M[7],15M[9],H2[12]
     candles = instruments.InstrumentsCandles(instrument=instrument,params=params)
     client.request(candles)
     ohlc_dict = candles.response["candles"]
@@ -133,20 +134,20 @@ def trade_signal():
 def main():
     currency =TRADING_INSTRUMENT
     print("StatAtr_test script analyzing ",currency)
+    data_h3 = candles_h3(currency)
     signal = trade_signal()
     if signal == "Buy":
-        market_order(currency,pos_size,str(900000))
+        market_order(currency,pos_size,str(ATR(data_h3,20)))
         print("New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
-
     elif signal == "Sell":
-        market_order(currency,-1*pos_size,str(900000))
+        market_order(currency,-1*pos_size,str(ATR(data_h3,20)))
         print("New short position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
 
     else:
         print(currency, "not meet the trade critiers", " final_delta_projected: ", final_delta_projected())
                 
 starttime=time.time()
-timeout = time.time() + (60*60*24*170)  # 60 seconds times 60 meaning the script will run for 1 hr
+timeout = time.time() + (60*60*24*17)  # 60 seconds times 60 meaning the script will run for 1 hr
 while time.time() <= timeout:
     try:
         print("passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))

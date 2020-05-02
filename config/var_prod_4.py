@@ -14,8 +14,8 @@ VALUE_FOR_BUY_ENTRY = 0.000829
 VALUE_FOR_SELL_ENTRY =-0.000829
 TRADING_INSTRUMENT = 'NZD_CAD'
 #$2CAD = 10.0 pip, stop_loss = -$16.5 = 82.2pip; take profit=164 pip
-pnl_value = 0
+pnl_value = 2
 time_interval= 9
 time_interval_sl = 12
 risk_distance = 0.000513
-risk_distance = 0.0001
+

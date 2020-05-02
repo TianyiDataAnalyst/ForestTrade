@@ -19,22 +19,63 @@ from ForestTrade.config import var_prod_1
 from ForestTrade.file_directory import file_name
 #from ForestTrade.Prod_1.prod_1_1_2_StatArbitrage_strategy import output_delta
 import re
+import oandapyV20.endpoints.trades as trades
 
-def final_delta_projected():   
-    for line in open("C:\\Users\\gutia\\Anaconda3\\ForestTrade\\log\\prod_1_4_final_delta_projected.txt"):
-        pass
-    #print(line)    
-    regex=re.findall(r'(?<=value:).*?(?=\s)', line)
-    final_delta_projected = ' '.join(map(str, regex))
-    final_delta_projected = float(final_delta_projected)
-    return final_delta_projected
-
-#
-CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
 
 #initiating API connection and defining trade parameters
 client = oandapyV20.API(str(token.token),environment="practice")
 account_id = account.oanda_pratice_account_id
+
+#Number of open positions:
+r = trades.OpenTrades(accountID=account_id)
+open_trades = client.request(r)['trades']  
+df_open_trade= pd.DataFrame(client.request(trades.OpenTrades(accountID=account_id))['trades'])    
+df_open_trade.index[-1]
+
+df_open_trade['unrealizedPL'] = df_open_trade['unrealizedPL'].apply(pd.to_numeric)
+df_open_trade['currentUnits'] = df_open_trade['currentUnits'].apply(pd.to_numeric)
+report_1=df_open_trade.groupby('currentUnits').count()
+
+df_open_trade['id'][df_open_trade['unrealizedPL'] > 0.0].count()
+
+# close profitable positions and make Long- Short in balance
+take_profit_value = 0.0
+trade_ids = []
+trade_id = []
+currentUnits = df_open_trade['currentUnits']
+r = trades.OpenTrades(accountID=account_id)
+open_trades = client.request(r)['trades']
+ 
+
+def unrealizedPL_trade(trade_id):      
+    df_open_trade= pd.DataFrame(client.request(trades.OpenTrades(accountID=account_id))['trades'])
+    df_open_trade['unrealizedPL'] = df_open_trade['unrealizedPL'].apply(pd.to_numeric)
+    df_open_trade.index = df_open_trade['id']
+    return df_open_trade['unrealizedPL'][trade_id]
+
+def trade_close(trade_ID, curr_unit): #OANDA REST-V20 API Documentation,Page 67
+        account_id= account.oanda_pratice_account_id
+        data = {
+                "units": str(curr_unit),
+                "tradeID": str(trade_ID)
+                }
+        r = trades.TradeClose(accountID=account_id, tradeID=trade_ID, data=data)
+        client.request(r)
+
+for i in range(len(open_trades)):
+    trade_ids.append(open_trades[i]['id'])
+trade_id = [i for i in trade_ids if i not in trade_ids]
+for trade_id in trade_ids:       
+    unit = 2000
+    pnl = float(unrealizedPL_trade(trade_id))
+    pnl_value = take_profit_value
+    if pnl > pnl_value: 
+        print("Close trade:")
+        print("ID:", trade_id, "pnl_value:", pnl)   
+        trade_close(trade_id, unit)
+
+
+CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
 
 TRADING_INSTRUMENT = var_prod_1.TRADING_INSTRUMENT
          
@@ -133,26 +174,25 @@ def trade_signal():
 def main():
     currency =TRADING_INSTRUMENT
     print("StatAtr_test script analyzing ",currency)
+    data_h3 = candles_h3(currency)
     signal = trade_signal()
     if signal == "Buy":
-        market_order(currency,pos_size,str(900000))
+        market_order(currency,pos_size,str(ATR(data_h3,20)))
         print("New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
-
+        f = open(file_name('log\\trade_log.txt'), "a+")
+        f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + " New long position initiated for " + currency + '\n' )
+        f.close()
     elif signal == "Sell":
-        market_order(currency,-1*pos_size,str(900000))
+        market_order(currency,-1*pos_size,str(ATR(data_h3,20)))
         print("New short position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
-
+        f = open(file_name('log\\trade_log.txt'), "a+")
+        f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + " New short position initiated for " + currency + '\n' )
+        f.close()
     else:
         print(currency, "not meet the trade critiers", " final_delta_projected: ", final_delta_projected())
                 
-starttime=time.time()
-timeout = time.time() + (60*60*24*170)  # 60 seconds times 60 meaning the script will run for 1 hr
-while time.time() <= timeout:
-    try:
-        print("passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
-        main()
-        time.sleep(900 - ((time.time() - starttime) % 900.0)) # orignial 300=5 minute interval between each new execution
-    except KeyboardInterrupt:
-        print('\n\nKeyboard exception received. Exiting.')
-        exit()
 
+
+
+    
+    
