@@ -19,7 +19,8 @@ from ForestTrade.config import token
 from ForestTrade.config import var_prod_1
 import oandapyV20.endpoints.forexlabs as labs
 
-TRADING_INSTRUMENT = var_prod_1.TRADING_INSTRUMENT
+#var_prod_1.TRADING_INSTRUMENT
+TRADING_INSTRUMENT = 'XAU_CAD'
 #
 CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.keys())
 
@@ -128,18 +129,18 @@ def clean_format(instrument):
 
 
 #usdcad = clean_format('USD_CAD')
-audcad = clean_format('AUD_CAD')
+xaucad = clean_format('XAU_CAD')
 #eurcad = clean_format('EUR_CAD')
-nzdcad = clean_format('NZD_CAD')
+xauaud = clean_format('XAU_AUD')
 #spxusd = clean_format('SPX500_USD')
 #au200aud = clean_format('AU200_AUD')
 
 #symbols_data = {'USD_CAD' : usdcad, 'AUD_CAD': audcad, 'NZD_CAD':nzdcad,'SPX500_USD': spxusd, 'AU200_AUD': au200aud }  #'EUR_CAD': eurcad, is not corrolated
-symbols_data = {'AUD_CAD': audcad, 'NZD_CAD':nzdcad}
+symbols_data = {'XAU_CAD': xaucad, 'XAU_AUD':xaucad}
 
 
 #SYMBOLS = ['USD_CAD','AUD_CAD','NZD_CAD','AU200_AUD','SPX500_USD'] #,'SPX500_USD'
-SYMBOLS = ['NZD_CAD','AUD_CAD']
+SYMBOLS = ['XAU_CAD','XAU_AUD']
 #symbols_data = {  'JPY_USD': jpyusd, 'CHF_USD': chfusd, 'AUD_USD' : audusd, 'NZD_USD': nzdusd, 'EUR_USD': eurusd, 'GBP_USD': gbpusd, 'CAD_USD': cadusd}
 for symbol in SYMBOLS:
     data = symbols_data[symbol]

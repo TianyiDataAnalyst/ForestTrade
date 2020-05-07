@@ -4,6 +4,7 @@ Created on Fri May  1 22:33:00 2020
 
 @author: gutia
 """
+https://readthedocs.org/projects/technical-analysis-library-in-python/downloads/pdf/latest/
 
 import pandas as pd
 from ta.volatility import BollingerBands
@@ -65,4 +66,4 @@ df['bb_bbli'] = indicator_bb.bollinger_lband_indicator()
 df['bb_bbw'] = indicator_bb.bollinger_wband()
 
 # Add Percentage Bollinger Bands
-df['bb_bbp'] = indicator_bb.bollinger_pband()
+df['bb_bbp'] = indicator_bb.bollinger_pband()4

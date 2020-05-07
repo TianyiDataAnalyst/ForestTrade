@@ -5,18 +5,16 @@ Created on Thu Mar 12 14:27:05 2020
 
 @author: tianyigu
 """
-
+import time
 import oandapyV20
 import oandapyV20.endpoints.instruments as instruments
 import oandapyV20.definitions.instruments as definstruments
 import pandas as pd
 #import matplotlib.pyplot as plt
 import oandapyV20.endpoints.orders as orders
-import time
 from ForestTrade.config import oanda_login as account
 from ForestTrade.config import token
 from ForestTrade.config import var_prod_1
-from ForestTrade.file_directory import file_name
 #from ForestTrade.Prod_1.prod_1_1_2_StatArbitrage_strategy import output_delta
 import re
 import oandapyV20.endpoints.trades as trades
@@ -35,7 +33,7 @@ CandlestickGranularity = (definstruments.CandlestickGranularity().definitions.ke
 
 #initiating API connection and defining trade parameters
 client = oandapyV20.API(str(token.token),environment="practice")
-account_id = account.oanda_pratice_account_id_a2
+
 
 TRADING_INSTRUMENT = var_prod_1.TRADING_INSTRUMENT
          
@@ -83,7 +81,7 @@ def candles_h3(instrument):
     ohlc_m15_df = ohlc_df.apply(pd.to_numeric)
     return ohlc_m15_df
 
-def market_order(instrument,units,sl):
+def market_order(instrument,units,sl,account_id):
     #"""units can be positive or negative, stop loss (in pips) added/subtracted to price """  
     data = {
             "order": {
@@ -130,44 +128,137 @@ def trade_signal():
         signal = "Sell"
     return signal
 
-def postion_balanace(l_s):
+#account_id = '101-002-9736246-002'
+#l_s = 'short'
+def postion_balanace(l_s,account_id):
+    account_id=account_id
     df_open_trade= pd.DataFrame(client.request(trades.OpenTrades(accountID=account_id))['trades'])    
-    df_open_trade['currentUnits'] = df_open_trade['currentUnits'].apply(pd.to_numeric)
-    count_short_position = df_open_trade['id'][df_open_trade['currentUnits'] > 0.0].count()
-    count_long_position = df_open_trade['id'][df_open_trade['currentUnits'] < 0.0].count()
+    r = trades.OpenTrades(accountID=account_id)
+    open_trades = client.request(r)['trades']
+    r = trades.OpenTrades(accountID=account_id)
+    df_open_trade= pd.DataFrame(client.request(trades.OpenTrades(accountID=account_id))['trades'])
+    balance_signal = ''    
+    if len(open_trades) > 0:
+        df_open_trade['currentUnits'] = df_open_trade['currentUnits'].apply(pd.to_numeric)
+        count_short_position = df_open_trade['id'][df_open_trade['currentUnits'] < 0.0].count()
+        count_long_position = df_open_trade['id'][df_open_trade['currentUnits'] > 0.0].count()
+    elif len(open_trades) == 0:
+        count_short_position = 0
+        count_long_position = 0
     if l_s =="short":
-        if count_short_position <20:
+        if count_short_position <var_prod_1.short_position_limit:
             balance_signal = "short_open"
-        elif count_short_position ==20:
+        elif count_short_position ==var_prod_1.short_position_limit:
             balance_signal = "short_close"
     if l_s =="long":            
-        if count_long_position <19:
+        if count_long_position <var_prod_1.long_position_limit:
             balance_signal = "long_open"
-        elif count_long_position ==19:
+        elif count_long_position ==var_prod_1.long_position_limit:
             balance_signal = "long_close"
     return balance_signal
 #postion_balanace(l_s="short")
 
 def main():
-    currency =TRADING_INSTRUMENT
-    print("StatAtr_test script analyzing ",currency)
+    global client
+    account_ids = account.account_ids
+    account_id = []
+    if len(account_ids)>0:
+        for account_id in account_ids:
+            account_id=account_id
+            print(account_id)
+            r = trades.OpenTrades(accountID=account_id)
+            open_trades = client.request(r)['trades']
+            trade_id = []
+            trade_ids = []
+            currency =TRADING_INSTRUMENT
+            print(account_id, "Prod_1_a2 StatAtr_test script analyzing ",currency)
+            signal = trade_signal()
+            if signal == "Buy" and postion_balanace(l_s="long", account_id=account_id) == 'long_open':
+                market_order(currency,1*pos_size,str(0.50000), account_id)
+                account_id=account_id
+                print(account_id, "New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
+        
+            elif signal == "Sell" and postion_balanace(l_s="short", account_id=account_id) == 'short_open':
+                market_order(currency,-1*pos_size,str(0.50000), account_id)
+                account_id=account_id
+                print(account_id, "New short position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
+        
+            else:
+                account_id=account_id
+                print(account_id, "not meet the trade critiers", " final_delta_projected: ", final_delta_projected())
+    account_ids_vam = account.account_ids_vam
+    account_id = []
+    if len(account_ids_vam)>0:
+        for account_id in account_ids_vam:
+            account_id=account_id
+            print(account_id)
+            r = trades.OpenTrades(accountID=account_id)
+            client = oandapyV20.API(str(token.token),environment="practice")
+            currency =TRADING_INSTRUMENT
+            print("VAM", account_id, "Prod_1_a2 StatAtr_test script analyzing ",currency)
+            signal = trade_signal()
+            if signal == "Buy" and postion_balanace(l_s="short", account_id=account_id) == 'short_open':
+                market_order(currency,-1*pos_size,str(0.50000), account_id)
+                account_id=account_id
+                print(account_id, "New VAM short position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
+        
+            elif signal == "Sell" and postion_balanace(l_s="long",account_id=account_id) == 'long_open':
+                market_order(currency,1*pos_size,str(0.50000), account_id)
+                account_id=account_id
+                print(account_id, "New VAM long position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
+        
+            else:
+                print(account_id, "not meet the trade critiers", " final_delta_projected: ", final_delta_projected())
+    
+    account_id = account.oanda_pratice_account_id_a6
+    print(account_id)
+    r = trades.OpenTrades(accountID=account_id)
+    open_trades = client.request(r)['trades']
+    trade_id = []
+    trade_ids = []
+    currency =var_prod_1.TRADING_INSTRUMENT_2
+    print(account_id, "Prod_1_a2 StatAtr_test script analyzing ",currency)
     signal = trade_signal()
-    if signal == "Buy" and postion_balanace(l_s="long") == 'long_open':
-        market_order(currency,pos_size,str(300000))
+    if signal == "Buy" and postion_balanace(l_s="long", account_id=account_id) == 'long_open':
+        market_order(currency,1*pos_size,str(0.50000), account_id)
+        account_id=account_id
         print(account_id, "New long position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
 
-    elif signal == "Sell" and postion_balanace(l_s="short") == 'short_open':
-        market_order(currency,-1*pos_size,str(300000))
+    elif signal == "Sell" and postion_balanace(l_s="short", account_id=account_id) == 'short_open':
+        market_order(currency,-1*pos_size,str(0.50000), account_id)
+        account_id=account_id
         print(account_id, "New short position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
 
     else:
+        account_id=account_id
         print(account_id, "not meet the trade critiers", " final_delta_projected: ", final_delta_projected())
-                
+    
+    for account_id in account_ids_vam:
+            account_id=account_id
+            print(account_id)
+            r = trades.OpenTrades(accountID=account_id)
+            client = oandapyV20.API(str(token.token),environment="practice")
+            currency =TRADING_INSTRUMENT
+            print("VAM", account_id, "Prod_1_a2 StatAtr_test script analyzing ",currency)
+            signal = trade_signal()
+            if signal == "Buy" and postion_balanace(l_s="short", account_id=account_id) == 'short_open':
+                market_order(currency,-1*pos_size,str(0.50000), account_id)
+                account_id=account_id
+                print(account_id, "New VAM short position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
+        
+            elif signal == "Sell" and postion_balanace(l_s="long",account_id=account_id) == 'long_open':
+                market_order(currency,1*pos_size,str(0.50000), account_id)
+                account_id=account_id
+                print(account_id, "New VAM long position initiated for ", currency, " final_delta_projected: ", final_delta_projected())
+        
+            else:
+                print(account_id, "not meet the trade critiers", " final_delta_projected: ", final_delta_projected())
+                    
 starttime=time.time()
 timeout = time.time() + (60*60*24*170)  # 60 seconds times 60 meaning the script will run for 1 hr
 while time.time() <= timeout:
     try:
-        print(account_id, "passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+        print( "passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
         main()
         time.sleep(900 - ((time.time() - starttime) % 900.0)) # orignial 300=5 minute interval between each new execution
     except KeyboardInterrupt:

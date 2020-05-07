@@ -209,9 +209,9 @@ for i in range(0, num_days):
       
   # 2
   """
-  Next, we need to compute the relationships between the CAD/USD currency pair price deviations and the other currency pair price deviations. 
+  Next, we need to compute the relationships between the NZD_CAD currency pair price deviations and the other currency pair price deviations. 
   We will use covariance and correlation between the series of price deviations from SMA that we computed in the previous section. In this same loop, 
-  we will also compute the CAD/USD price deviation as projected by every other lead currency pair, and see what the difference between 
+  we will also compute the NZD_CAD price deviation as projected by every other lead currency pair, and see what the difference between 
   the projected price deviation and actual price deviation is. We will need these individual deltas between projected price deviation and 
   actual price deviation to get a final delta value that we will use for trading.
   """
@@ -254,9 +254,9 @@ for i in range(0, num_days):
     delta_projected_actual_history[correlation_label].append(delta_projected_actual)
   #3
   """
-  Let's combine these individual deltas between projected and actual price deviation in CAD/USD to get one final StatArb signal value for CAD/USD 
+  Let's combine these individual deltas between projected and actual price deviation in NZD_CAD to get one final StatArb signal value for NZD_CAD 
   that is a combination of projections from all the other currency pairs. To combine these different projections, we will use the magnitude of the correlation 
-  between CAD/USD and the other currency pairs to weigh the delta between projected and actual price deviations in CAD/USD as predicted by the other pairs. 
+  between NZD_CAD and the other currency pairs to weigh the delta between projected and actual price deviations in NZD_CAD as predicted by the other pairs. 
   Finally, we will normalize the final delta value by the sum of each individual weight (magnitude of correlation) and 
   that is what we will use as our final signal to build our trading strategy around:
   """
@@ -402,7 +402,7 @@ plt.show()
 print ('plot 2')
 """
 Let's visualize a few more details about the signals in this trading strategy, starting with the correlations 
-between CAD/USD and the other currency pairs as it evolves over time:
+between NZD_CAD and the other currency pairs as it evolves over time:
 
 """
 # Plot correlations between TRADING_INSTRUMENT and other currency pairs
@@ -427,14 +427,14 @@ Correlations close to -1 or +1 signify strongly correlated pairs, and correlatio
 Currency pairs where correlations swing around between negative and positive values indicate extremely uncorrelated or unstable currency pairs, 
 which are unlikely to yield good predictions in the long run. However, we do not know how the correlation would evolve ahead of time, 
 so we have no choice but to use all currency pairs available to us in our StatArb trading strategy:
-As we suspected, the currency pairs that are most strongly correlated to CAD/USD price deviations are AUD/USD and NZD/USD. 
-JPY/USD is the least correlated to CAD/USD price deviations.
+As we suspected, the currency pairs that are most strongly correlated to NZD_CAD price deviations are AUD/USD and NZD/USD. 
+JPY/USD is the least correlated to NZD_CAD price deviations.
 """
 
 #
 print ('plot 3')
 """
-Now, let's inspect the delta between projected and actual price deviations in CAD/USD as projected by 
+Now, let's inspect the delta between projected and actual price deviations in NZD_CAD as projected by 
 each individual currency pair individually:
 """
 # Plot StatArb signal provided by each currency pair
@@ -449,7 +449,7 @@ for symbol in SYMBOLS:
 plt.legend()
 plt.show()
 """
-This is what the StatArb signal values would look like if we used any of the currency pairs alone to project CAD/USD price deviations:
+This is what the StatArb signal values would look like if we used any of the currency pairs alone to project NZD_CAD price deviations:
    ~ Chart ~
 Here, the plot seems to suggest that JPYUSD and CHFUSD have very large predictions, but as we saw before those pairs do not have good correlations with CADUSD, 
 so these are likely to be bad predictions due to poor predictive relationships between CADUSD - JPYUSD and CADUSD - CHFUSD. One lesson to take away from this is that 

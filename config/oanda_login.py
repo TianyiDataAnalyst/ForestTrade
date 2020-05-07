@@ -20,14 +20,15 @@ oanda_pratice_account_id_a2 = "101-002-9736246-002"
 oanda_pratice_account_id_3 = "101-002-9736246-003"
 
 #Primary V20, MT4  demo4 timetrek1212
-oanda_pratice_account_id_4 = "101-002-9736246-004"
+oanda_pratice_account_id_a4 = "101-002-9736246-004"
 
 #Primary V20, MT4  demo5 Newera1212
 oanda_pratice_account_id = "101-002-9736246-005"
 
 
-#Primary V20, MT4  demo5 Newera1212
-oanda_pratice_account_id = "101-002-9736246-005"
+#Primary V20, MT4  demo6 Newera1212
+oanda_pratice_account_id_a6 = "101-002-9736246-006"
+
 
 #demo 1_a7
 """
@@ -38,3 +39,8 @@ Pricing Type	MT4 Active
 Newera1212
 """
 oanda_pratice_account_id_a7 = "101-002-9736246-007"
+
+
+account_ids = ['101-002-9736246-002','101-002-9736246-005']
+account_ids_vam = ['101-002-9736246-007']
+account_universe = ['101-002-9736246-001','101-002-9736246-002','101-002-9736246-003','101-002-9736246-004','101-002-9736246-005','101-002-9736246-006','101-002-9736246-007']
