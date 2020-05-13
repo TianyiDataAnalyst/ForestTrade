@@ -23,9 +23,12 @@ def final_delta_projected():
     for line in open("C:\\Users\\gutia\\Anaconda3\\ForestTrade\\log\\prod_1_a2_final_delta_projected.txt"):
         pass
     #print(line)    
-    regex=re.findall(r'(?<=value:).*?(?=\s)', line)
+    regex=re.findall(r'(?<=value: ).*?(?=\s)', line)
     final_delta_projected = ' '.join(map(str, regex))
-    final_delta_projected = float(final_delta_projected)
+    if final_delta_projected ==None:
+        pass
+    else:
+        final_delta_projected = float(final_delta_projected)
     return final_delta_projected
 
 #
